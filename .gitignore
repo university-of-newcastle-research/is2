@@ -1,39 +1,40 @@
-# History files
+# Ignore R associated files
+.Rproj.user
 .Rhistory
-.Rapp.history
 
-# Session Data files
-.RData
-
-# User-specific files
-.Ruserdata
-
-# Example code in package build process
-*-Ex.R
-
-# Output files from R CMD build
-/*.tar.gz
-
-# Output files from R CMD check
-/*.Rcheck/
-
-# RStudio files
-.Rproj.user/
-
-# produced vignettes
+# ignore produced vignettes
+inst/doc/*
 vignettes/*.html
 vignettes/*.pdf
 
-# OAuth2 token, see https://github.com/hadley/httr/releases/tag/v0.3
-.httr-oauth
+# ignore OS X Finder files
+*.DS_Store
 
-# knitr and R markdown default cache directories
-*_cache/
-/cache/
+# ignore emacs backup files
+*~
 
-# Temporary files created by R markdown
-*.utf8.md
-*.knit.md
+#Ignore packrat libraries
+packrat/lib*/
+#Ignore packrat sources
+packrat/src/
 
-# R Environment Variables
-.Renviron
+# ignore vim swap files
+.swp
+
+#Ignore output data
+data/output/
+
+#Ignore RCheck directory
+..Rcheck/
+
+#Ignore vim swap files
+*.swp
+
+#Ignore TEMP dir (for comparing to Reilly/Scott code
+TEMP/
+inst/doc
+doc
+Meta
+
+#Cran submission
+pmwg.Rcheck/
