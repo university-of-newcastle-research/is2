@@ -21,6 +21,8 @@ length_draws = sampled$samples$idx #length of the full transformed random effect
 IS_samples = 10000 #number of importance samples
 n_particles = 1000 #number of particles
 v_alpha = 2  #?
+pars = sampled$pars
+
 
 # grab the sampled stage of PMwG
 # store the random effects
@@ -133,7 +135,7 @@ prior_dist = function(parameters, prior_parameters = sampled$prior, n_randeffect
   param.a <- exp(parameters[((length(parameters)-n_randeffect)+1):(length(parameters))])
   v_alpha=2
   
-  log_prior_mu=mvtnorm::dmvnorm(param.theta.mu, mean = prior_parameters$theta_mu, sigma = prior_parameters$theta_sig, log =TRUE)
+  log_prior_mu=mvtnorm::dmvnorm(param.theta.mu, mean = prior_parameters$theta_mu_mean, sigma = prior_parameters$theta_me_var, log =TRUE)
   log_prior_sigma = log(diwish(param.theta.sig2, v=v_alpha+ n_randeffect-1, S = 2*v_alpha*diag(1/param.a)))  #exp of a-half -> positive only
   log_prior_a = sum(dinvgamma(param.a,scale = 0.5,shape=1,log=TRUE))
   
@@ -169,7 +171,7 @@ get_logp=function(prop_theta,data,n_subjects,n_particles,n_randeffect,mu_tilde,s
       #mod notes: this is the bit the prior effects
       names(x)<-pars
       #   do lba log likelihood with given parameters for each subject, gets density of particle from ll func
-      logw_first=sampled$ll_func(x,data = data[data$subject==j,]) #mod notes: do we pass this in or the whole sampled object????
+      logw_first=sampled$ll_func(x,data = data[as.numeric(factor(data$subjects))==j,]) #mod notes: do we pass this in or the whole sampled object????
       # below gets second part of equation 5 numerator ie density under prop_theta
       # particle k and big vector of things
       logw_second<-group_dist(random_effect = particles[k,], parameters = prop_theta[i,], sample= FALSE, n_randeffect = n_randeffect) #mod notes: group dist
