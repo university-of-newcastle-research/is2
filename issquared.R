@@ -33,7 +33,7 @@ theta <- sampled$samples$theta_mu[,sampled$samples$stage=="sample"]
 sig <- sampled$samples$theta_sig[,,sampled$samples$stage=="sample"]
 # the a-hlaf is used in  calculating the Huang and Wand (2013) prior. 
 # The a is a random sample from inv gamma which weights the inv wishart. The mix of inverse wisharts is the prior on the correlation matrix
-a_half <- sampled$samples$a_half[,sampled$samples$stage=="sample"]
+a_half <- log(sampled$samples$a_half[,sampled$samples$stage=="sample"])
 
 
 
