@@ -79,8 +79,8 @@ X <- cbind(t(theta),t(pts2.unwound),t(a_half))
 k = 2 #number of dists
 
 #mvnormalmixEM is a weak point - function can fail. needs a note or output to show if it doesn't work. Should restart if it fails
-mix = NA
-while(is.na(mix)) {
+mix = NULL
+while(is.null(mix)) {
   tryCatch(mix<-mvnormalmixEM(X,k=k, maxit = 5000),error=function(e){
   },finally={})
 }
@@ -224,6 +224,7 @@ if (cpus>1){
                   n_randeffect = n_randeffect,mu_tilde=mu_tilde,sigma_tilde = sigma_tilde, prior_dist=prior_dist, sampled=sampled)
 } else{
   for (i in 1:IS_samples){
+    cat(i)
     tmp[i]<-compute_lw(prop_theta,data,n_subjects,n_particles, n_randeffect,mu_tilde,sigma_tilde,i,prior_dist=prior_dist, sampled=sampled)
   }
 }
