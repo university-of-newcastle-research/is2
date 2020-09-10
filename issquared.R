@@ -11,7 +11,7 @@ library(condMVNorm)
 library(parallel)
 load("forstmann_is2_3b3t.Rdata")
 
-cpus = 10
+cpus = 1
 ###### set up variables #####
 # number of particles, samples, subjects, random effects etc
 n_randeffect=sampled$n_pars
@@ -37,21 +37,8 @@ a_half <- sampled$samples$a_half[,sampled$samples$stage=="sample"]
 
 
 
-unwind=function(x,reverse=FALSE) {
-
-  if (reverse) {
-    ##        if ((n*n+n)!=2*length(x)) stop("Wrong sizes in unwind.")
-    n=sqrt(2*length(x)+0.25)-0.5 ## Dim of matrix.
-    out=array(0,dim=c(n,n))
-    out[lower.tri(out,diag=TRUE)]=x
-    diag(out)=exp(diag(out))
-    out=out%*%t(out)
-  } else {
-    y=t(chol(x))
-    diag(y)=log(diag(y))
-    out=y[lower.tri(y,diag=TRUE)]
-  }
-  return(out)
+unwind <- function(x, reverse=FALSE) {
+  if (reverse) pmwg:::wind(x) else pmwg:::unwind(x)
 }
 
 #unwound sigma
@@ -80,7 +67,9 @@ k = 2 #number of dists
 
 #mvnormalmixEM is a weak point - function can fail. needs a note or output to show if it doesn't work. Should restart if it fails
 mix = NA
+i = 0
 while(is.na(mix)) {
+  print(i <- i + 1)
   tryCatch(mix<-mvnormalmixEM(X,k=k, maxit = 5000),error=function(e){
   },finally={})
 }
