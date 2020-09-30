@@ -19,8 +19,6 @@ group_dist <- function(random_effect = NULL,
   }
 }
 
-
-
 prior_dist = function(parameters, prior_parameters = prior, n_randeffect){ ###mod notes: the sampled$prior needs to be fixed/passed in some other time
   param.theta.mu <- parameters[(1:n_randeffect)*2-1]
   names(param.theta.mu)<-par.names
@@ -34,7 +32,6 @@ prior_dist = function(parameters, prior_parameters = prior, n_randeffect){ ###mo
   }
   return(output)
 }
-
 
 get_logp=function(prop_theta,data,n_subjects,n_particles,n_randeffect,mu_tilde,sigma_tilde,i, group_dist=group_dist){
   #make an array for the density
