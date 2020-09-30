@@ -16,7 +16,6 @@ vignettes/*.pdf
 #Ignore packrat libraries
 packrat/lib*/
 #Ignore packrat sources
-packrat/src/
 
 # ignore vim swap files
 .swp
