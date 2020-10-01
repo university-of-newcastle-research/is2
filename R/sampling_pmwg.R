@@ -1,8 +1,8 @@
-group_dist <- function(random_effect = NULL,
-                       parameters,
-                       sample = FALSE,
-                       n_samples = NULL,
-                       n_randeffect) {
+group_dist_pmwg <- function(random_effect = NULL,
+                            parameters,
+                            sample = FALSE,
+                            n_samples = NULL,
+                            n_randeffect) {
   theta_mu <- parameters[1:n_randeffect]
   ## scott would like it to ask for n(unwind) rather than doing the calculation
   # for how many it actually needs, you should just input the length of the
@@ -17,7 +17,9 @@ group_dist <- function(random_effect = NULL,
   }
 }
 
-prior_dist <- function(parameters, prior_parameters = sampled$prior, n_randeffect) { ### mod notes: the sampled$prior needs to be fixed/passed in some other time
+prior_dist_pmwg <- function(parameters,
+                            prior_parameters = NULL,
+                            n_randeffect) {
   theta_mu <- parameters[1:n_randeffect]
   theta_sig_unwound <- parameters[(n_randeffect + 1):(length(parameters) - n_randeffect)] ## scott would like it to ask for n(unwind)
   theta_sig <- unwind(theta_sig_unwound, reverse = TRUE)
@@ -34,7 +36,7 @@ prior_dist <- function(parameters, prior_parameters = sampled$prior, n_randeffec
   return(log_prior_mu + log_prior_sigma + log_prior_a + logw_den3 - logw_den2)
 }
 
-get_logp <- function(prop_theta, data, n_subjects, n_particles, n_randeffect, mu_tilde, sigma_tilde, i, group_dist = group_dist) {
+get_logp <- function(prop_theta, data, n_subjects, n_particles, n_randeffect, mu_tilde, sigma_tilde, i, ll_func, group_dist = group_dist_pmwg) {
   # make an array for the density
   logp <- array(dim = c(n_particles, n_subjects))
   # for each subject, get 1000 IS samples (particles) and find log weight of each
@@ -90,8 +92,8 @@ get_logp <- function(prop_theta, data, n_subjects, n_particles, n_randeffect, mu
   return(sum(subj_logp))
 }
 
-compute_lw <- function(prop_theta, data, n_subjects, n_particles, n_randeffect, mu_tilde, sigma_tilde, i, prior_dist = prior_dist, sampled = sampled) {
-  logp.out <- get_logp(prop_theta, data, n_subjects, n_particles, n_randeffect, mu_tilde, sigma_tilde, i, group_dist = group_dist)
+compute_lw <- function(prop_theta, data, n_subjects, n_particles, n_randeffect, mu_tilde, sigma_tilde, i, prior_dist = prior_dist_pmwg, sampled = sampled) {
+  logp.out <- get_logp(prop_theta, data, n_subjects, n_particles, n_randeffect, mu_tilde, sigma_tilde, i)
   ## do equation 10
   logw_num <- logp.out[1] + prior_dist(parameters = prop_theta[i, ], prior_parameters = sampled$prior, n_randeffect)
   logw_den <- log(mix_weight[1] * mvtnorm::dmvnorm(prop_theta[i, ], mix_mu[[1]], mix_sigma[[1]]) + mix_weight[2] * mvtnorm::dmvnorm(prop_theta[i, ], mix_mu[[2]], mix_sigma[[2]])) # density of proposed params under the means
