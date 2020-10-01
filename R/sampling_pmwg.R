@@ -4,11 +4,8 @@ group_dist_pmwg <- function(random_effect = NULL,
                             n_samples = NULL,
                             n_randeffect) {
   theta_mu <- parameters[1:n_randeffect]
-  ## scott would like it to ask for n(unwind) rather than doing the calculation
-  # for how many it actually needs, you should just input the length of the
-  # unwound object
   theta_sig_unwound <- parameters[(n_randeffect + 1):(length(parameters) - n_randeffect)]
-  theta_sig <- wind(theta_sig_unwound, reverse = TRUE)
+  theta_sig <- unwind(theta_sig_unwound)
   if (sample) {
     return(mvtnorm::rmvnorm(n_samples, theta_mu, theta_sig))
   } else {
@@ -22,7 +19,7 @@ prior_dist_pmwg <- function(parameters,
                             n_randeffect) {
   theta_mu <- parameters[1:n_randeffect]
   theta_sig_unwound <- parameters[(n_randeffect + 1):(length(parameters) - n_randeffect)] ## scott would like it to ask for n(unwind)
-  theta_sig <- unwind(theta_sig_unwound, reverse = TRUE)
+  theta_sig <- unwind(theta_sig_unwound)
   param.a <- exp(parameters[((length(parameters) - n_randeffect) + 1):(length(parameters))])
   v_alpha <- 2
 
@@ -48,7 +45,7 @@ get_logp <- function(prop_theta, data, n_subjects, n_particles, n_randeffect, mu
     if (n1 > (n_particles - 2)) n1 <- n_particles - 2 ## These just avoid degenerate arrays.
     n2 <- n_particles - n1
     # do conditional MVnorm based on the proposal distribution
-    conditional <- condMVN(
+    conditional <- condMVNorm::condMVN(
       mean = mu_tilde[j, ], sigma = sigma_tilde[j, , ], dependent.ind = 1:n_randeffect,
       given.ind = (n_randeffect + 1):n.params, X.given = prop_theta[i, 1:(n.params - n_randeffect)]
     )
