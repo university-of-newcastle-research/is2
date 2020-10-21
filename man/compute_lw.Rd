@@ -18,7 +18,8 @@ compute_lw(
   group_dist,
   mix,
   n.params,
-  par.names
+  par.names,
+  ll_func
 )
 }
 \arguments{
@@ -53,6 +54,8 @@ group distribution}
 \item{n.params}{- The number of parameters in total}
 
 \item{par.names}{- The names of each parameter}
+
+\item{ll_func}{- The log lielihood function passed onto other functions}
 }
 \value{
 The logweight of the importance samples

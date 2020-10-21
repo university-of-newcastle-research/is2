@@ -18,12 +18,13 @@
 #' @param mix - The calculated values for the importance mixing vars
 #' @param n.params - The number of parameters in total
 #' @param par.names - The names of each parameter
+#' @param ll_func - The log lielihood function passed onto other functions
 #'
 #' @return The logweight of the importance samples
 #'
 #' @export
-compute_lw <- function(prop_theta, data, n_subjects, n_particles, n_randeffect, mu_tilde, sigma_tilde, i, prior_dist, prior, group_dist, mix, n.params, par.names) {
-  logp.out <- get_logp(prop_theta, data, n_subjects, n_particles, n_randeffect, mu_tilde, sigma_tilde, i, group_dist, n.params)
+compute_lw <- function(prop_theta, data, n_subjects, n_particles, n_randeffect, mu_tilde, sigma_tilde, i, prior_dist, prior, group_dist, mix, n.params, par.names, ll_func) {
+  logp.out <- get_logp(prop_theta, data, n_subjects, n_particles, n_randeffect, mu_tilde, sigma_tilde, i, ll_func, group_dist, n.params)
   ## do equation 10
   logw_num <- logp.out[1] + prior_dist(parameters = prop_theta[i, ], prior, n_randeffect, par.names)
   logw_den <- log(mix$lambda[1] * mvtnorm::dmvnorm(prop_theta[i, ], mix$mu[[1]], mix$sigma[[1]]) + mix$lambda[2] * mvtnorm::dmvnorm(prop_theta[i, ], mix$mu[[2]], mix$sigma[[2]])) # density of proposed params under the means
@@ -159,7 +160,7 @@ group_dist_pmwg <- function(random_effect = NULL,
                             n_randeffect) {
   theta_mu <- parameters[1:n_randeffect]
   theta_sig_unwound <- parameters[(n_randeffect + 1):(length(parameters) - n_randeffect)]
-  theta_sig <- unwind(theta_sig_unwound)
+  theta_sig <- wind(theta_sig_unwound)
   if (sample) {
     return(mvtnorm::rmvnorm(n_samples, theta_mu, theta_sig))
   } else {
