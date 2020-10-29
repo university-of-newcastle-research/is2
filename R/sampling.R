@@ -82,6 +82,7 @@ get_logp <- function(prop_theta, data, n_subjects, n_particles, n_randeffect, mu
       x <- particles[k, ]
       # names for ll function to work
       # mod notes: this is the bit the prior effects
+      names(x) <- par.names
       #   do lba log likelihood with given parameters for each subject, gets density of particle from ll func
       logw_first <- ll_func(x, data = data[as.numeric(factor(data$subjects)) == j, ]) # mod notes: do we pass this in or the whole sampled object????
       # below gets second part of equation 5 numerator ie density under prop_theta
@@ -117,6 +118,7 @@ group_dist_de <- function(random_effect = NULL,
                           sample = FALSE,
                           n_samples = NULL,
                           n_randeffect) {
+  #names(parameters)<- hpar.names
   theta_mu <- parameters[(1:n_randeffect) * 2 - 1]
   theta_sig <- parameters[(1:n_randeffect) * 2]
 
@@ -140,14 +142,14 @@ group_dist_de <- function(random_effect = NULL,
 }
 
 prior_dist_de <- function(parameters, prior, n_randeffect, par.names) { ### mod notes: the sampled$prior needs to be fixed/passed in some other time
-  param.theta.mu <- parameters[(1:n_randeffect) * 2 - 1]
-  names(param.theta.mu) <- par.names
+  theta.mu <- parameters[(1:n_randeffect) * 2 - 1]
+  names(theta.mu) <- par.names
   # needs par names
-  param.theta.sig <- parameters[(1:n_randeffect) * 2]
-  names(param.theta.sig) <- par.names
+  theta.sig <- parameters[(1:n_randeffect) * 2]
+  names(theta.sig) <- par.names
   output <- 0
   for (pars in par.names) {
-    output <- output + msm::dtnorm(param.theta.mu[pars], mean = prior[[pars]]$mu[1], sd = prior[[pars]]$mu[2], lower = 0, log = TRUE)
+    output <- output + msm::dtnorm(theta.mu[pars], mean = prior[[pars]]$mu[1], sd = prior[[pars]]$mu[2], lower = 0, log = TRUE)
     output <- output + stats::dgamma(param.theta.sig[pars], shape = prior[[pars]]$sig[1], rate = prior[[pars]]$sig[2], log = TRUE)
   }
   return(output)
@@ -175,7 +177,7 @@ prior_dist_pmwg <- function(parameters,
                             par.names = NULL) {
   theta_mu <- parameters[1:n_randeffect]
   theta_sig_unwound <- parameters[(n_randeffect + 1):(length(parameters) - n_randeffect)] ## scott would like it to ask for n(unwind)
-  theta_sig <- unwind(theta_sig_unwound)
+  theta_sig <- wind(theta_sig_unwound)
   param.a <- exp(parameters[((length(parameters) - n_randeffect) + 1):(length(parameters))])
   v_alpha <- 2
 

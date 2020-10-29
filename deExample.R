@@ -2,17 +2,17 @@
 
 ## set up environment and packages 
 rm(list=ls())
+library(mixtools)
 library(mvtnorm)
 library(MCMCpack)
 library(rtdists)
 library(invgamma)
-library(mixtools)
 library(condMVNorm)
 library(parallel)
-setwd("~/Documents/Research/Modelling Project/Work/recovery/de-mcmc")
+library(msm)
 
-load("3bs_fit.RData")
-
+load("b_fit.RData")
+burnin=round(nmc/2)
 cpus = 1
 ###### set up variables #####
 # number of particles, samples, subjects, random effects etc
@@ -39,13 +39,6 @@ phi_samples <- phi[,,burnin:(burnin+n_iter)]
 phi_samples <- aperm(phi_samples, c(1,3,2))
 dim(phi_samples)<- c(((n_iter+1)*n.chains),n_randeffect*2)
 phi_samples <- t(phi_samples[seq(1, length(phi_samples[,1]), 10),]) #thinning
-
-#sampled$samples$theta_mu[,sampled$samples$stage=="sample"]
-# store the cholesky transformed sigma
-# sig <- sampled$samples$theta_sig[,,sampled$samples$stage=="sample"]
-# the a-hlaf is used in  calculating the Huang and Wand (2013) prior. 
-# The a is a random sample from inv gamma which weights the inv wishart. The mix of inverse wisharts is the prior on the correlation matrix
-# a_half <- sampled$samples$a_half[,sampled$samples$stage=="sample"]
 
 
 n_iter <- length(phi_samples[1,])
@@ -74,7 +67,7 @@ k = 2 #number of dists
 #mvnormalmixEM is a weak point - function can fail. needs a note or output to show if it doesn't work. Should restart if it fails
 mix = NULL
 while(is.null(mix)) {
-  tryCatch(mix<-mvnormalmixEM(X,k=k, maxit = 5000),error=function(e){
+  tryCatch(mix<-mixtools::mvnormalmixEM(X,k=k, maxit = 5000),error=function(e){
   },finally={})
 }
 
