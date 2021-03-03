@@ -9,6 +9,7 @@ library(invgamma)
 library(mixtools)
 library(condMVNorm)
 library(parallel)
+devtools::load_all()
 load("forstmann_is2_3b3t.Rdata")
 
 cpus = 1
@@ -64,6 +65,7 @@ k = 2 #number of dists
 
 #mvnormalmixEM is a weak point - function can fail. needs a note or output to show if it doesn't work. Should restart if it fails
 mix = NULL
+
 while(is.null(mix)) {
   tryCatch(mix<-mvnormalmixEM(X,k=k, maxit = 5000),error=function(e){
   },finally={})
