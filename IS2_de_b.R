@@ -20,29 +20,29 @@ n_randeffect=length(theta[1,,1,1])
 n_subjects = length(theta[1,1,,1])
 n_iter = length(theta[1,1,1,])- burnin
 #length_draws = sampled$samples$idx #length of the full transformed random effect vector and/or parameter vector
-IS_samples = 54 #number of importance samples
-n_particles = 60 #number of particles
+IS_samples = 100 #number of importance samples
+n_particles = 100 #number of particles
 par.names = names(theta[1,,1,1])
 hpar.names = names(phi[1,,1])
 
 
 # grab the sampled stage of PMwG
 # store the random effects - theta
-theta_samples <- theta[,,,burnin:(burnin+n_iter)]
+theta_samples <- theta[,,,burnin:5000]
 theta_samples <- aperm(theta_samples, c(1,4,2,3))
-dim(theta_samples)<- c(((n_iter+1)*n.chains),n_randeffect,n_subjects)
-theta_samples <- theta_samples[seq(1, length(theta_samples[,1,1]), 10),,] #thinning
+dim(theta_samples)<- c((2501*20),5,40)
+theta_samples <- theta_samples[seq(1, length(theta_samples[,1,1]), 10),,]
 
 #sampled$samples$alpha[,,sampled$samples$stage=="sample"]
 # store the mu - phi
-phi_samples <- phi[,,burnin:(burnin+n_iter)]
+phi_samples <- phi[,,burnin:5000]
 phi_samples <- aperm(phi_samples, c(1,3,2))
 dim(phi_samples)<- c(((n_iter+1)*n.chains),n_randeffect*2)
 phi_samples <- t(phi_samples[seq(1, length(phi_samples[,1]), 10),]) #thinning
 
 
 n_iter <- length(phi_samples[1,])
-n.params<- n_randeffect*2+n_randeffect # theta+phi
+n.params<- n_randeffect*2+n_randeffect
 all_samples=array(dim=c(n_subjects,n.params,n_iter))
 mu_tilde=array(dim = c(n_subjects,n.params))
 sigma_tilde=array(dim = c(n_subjects,n.params,n.params))
@@ -114,7 +114,7 @@ if (cpus>1){
   }
 }
 
-
+save.image("IS2_de_bs.Rdata")
 # get the ML value
 finished <- tmp
 tmp<-unlist(tmp)
@@ -136,5 +136,5 @@ for (i in 1:bootstrap){
 var(log_marglik_boot)
 
 
-save.image("IS2_de.Rdata")
+save.image("IS2_de_bs.Rdata")
 
