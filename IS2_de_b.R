@@ -104,6 +104,13 @@ prop_theta=rbind(proposals1,proposals2)
 #makes an array to store the IS samples
 tmp <- array(dim = c(IS_samples))
 
+# Autofill the par.names for log.dens.like
+adj.log.dens.like <- function(x, data) {
+  log.dens.like(x, data, par.names = par.names)
+}
+
+data <- do.call(rbind, data)
+
 #do the sampling
 if (cpus > 1) {
   tmp <- mclapply(
@@ -123,7 +130,7 @@ if (cpus > 1) {
     mix = mix,
     n.params = n.params,
     par.names = par.names,
-    ll_func = log.dens.like
+    ll_func = adj.log.dens.like
   )
 } else {
   for (i in 1:IS_samples) {
@@ -143,7 +150,7 @@ if (cpus > 1) {
       mix = mix,
       n.params = n.params,
       par.names = par.names,
-      ll_func = log.dens.like
+      ll_func = adj.log.dens.like
       )
   }
 }
