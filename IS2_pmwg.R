@@ -41,7 +41,6 @@ a_half <- log(sampled$samples$a_half[,sampled$samples$stage=="sample"])
 
 #unwound sigma
 pts2.unwound = apply(sig,3,unwind)
-
 n.params<- nrow(pts2.unwound)+n_randeffect+n_randeffect
 all_samples=array(dim=c(n_subjects,n.params,n_iter))
 mu_tilde=array(dim = c(n_subjects,n.params))
@@ -109,7 +108,6 @@ prop_theta=rbind(proposals1,proposals2)
 tmp<-array(dim=c(IS_samples))
 
 
-
 #do the sampling
 if (cpus > 1) {
   tmp <- mclapply(
@@ -124,8 +122,12 @@ if (cpus > 1) {
     mu_tilde = mu_tilde,
     sigma_tilde = sigma_tilde,
     prior_dist = prior_dist_pmwg,
+    prior = sampled$prior,
+    group_dist = group_dist_pmwg,
     mix = mix,
-    n.params = n.params
+    n.params = n.params,
+    par.names = sampled$par_names,
+    ll_func = sampled$ll_func
   )
 } else{
   for (i in 1:IS_samples) {
@@ -140,8 +142,12 @@ if (cpus > 1) {
       sigma_tilde,
       i,
       prior_dist = prior_dist_pmwg,
+      prior = sampled$prior,
+      group_dist = group_dist_pmwg,
       mix = mix,
-      n.params = n.params
+      n.params = n.params,
+      par.names = sampled$par_names,
+      ll_func = sampled$ll_func
     )
   }
 }
