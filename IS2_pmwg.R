@@ -10,7 +10,7 @@ library(mixtools)
 library(condMVNorm)
 library(parallel)
 devtools::load_all()
-load("forstmann_is2_3b3t.Rdata")
+load("forstmann_long.Rdata")
 
 cpus = 1
 ###### set up variables #####
