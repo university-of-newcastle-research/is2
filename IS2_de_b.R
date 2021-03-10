@@ -10,6 +10,7 @@ library(invgamma)
 library(condMVNorm)
 library(parallel)
 library(msm)
+devtools::load_all()
 
 load("b_fit.RData")
 burnin=round(nmc/2)
@@ -74,14 +75,14 @@ while(is.null(mix)) {
 ###### generate the proposal parameters from the mix of importance samples  #####
 
 # use the weight to get samples for n1. n2 = samples-n1 (i.e 9000 and 1000)
-n1=rbinom(n=1, size=IS_samples,prob=max(mix_weight))
+n1=rbinom(n=1, size=IS_samples,prob=max(mix$lambda))
 n1=pmax(n1,2)
 n1=pmin(n1,IS_samples-2)
 n2=IS_samples-n1
 
 # generates the 10,000 IS proposals given the mix
-proposals1=rmvnorm(n1,mix_mu[[1]],mix_sigma[[1]])
-proposals2=rmvnorm(n2,mix_mu[[2]],mix_sigma[[2]])
+proposals1=rmvnorm(n1,mix$mu[[1]],mix$sigma[[1]])
+proposals2=rmvnorm(n2,mix$mu[[2]],mix$sigma[[2]])
 prop_theta=rbind(proposals1,proposals2)
 
 
