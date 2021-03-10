@@ -15,7 +15,8 @@ get_logp(
   i,
   ll_func,
   group_dist,
-  n.params
+  n.params,
+  par.names
 )
 }
 \arguments{
