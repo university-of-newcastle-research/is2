@@ -84,7 +84,7 @@ get_logp <- function(prop_theta, data, n_subjects, n_particles, n_randeffect, mu
       # mod notes: this is the bit the prior effects
       names(x) <- par.names
       #   do lba log likelihood with given parameters for each subject, gets density of particle from ll func
-      logw_first <- ll_func(x, data = data[as.numeric(factor(data$subjects)) == j, ]) # mod notes: do we pass this in or the whole sampled object????
+      logw_first <- ll_func(x, data = data[as.numeric(factor(data$subject)) == j, ]) # mod notes: do we pass this in or the whole sampled object????
       # below gets second part of equation 5 numerator ie density under prop_theta
       # particle k and big vector of things
       logw_second <- group_dist(random_effect = particles[k, ], parameters = prop_theta[i, ], sample = FALSE, n_randeffect = n_randeffect) # mod notes: group dist
@@ -181,7 +181,7 @@ prior_dist_pmwg <- function(parameters,
   param.a <- exp(parameters[((length(parameters) - n_randeffect) + 1):(length(parameters))])
   v_alpha <- 2
 
-  log_prior_mu <- mvtnorm::dmvnorm(theta_mu, mean = prior_parameters$theta_mu_mean, sigma = prior_parameters$theta_me_var, log = TRUE)
+  log_prior_mu <- mvtnorm::dmvnorm(theta_mu, mean = prior_parameters$theta_mu_mean, sigma = prior_parameters$theta_mu_var, log = TRUE)
   log_prior_sigma <- log(MCMCpack::diwish(theta_sig, v = v_alpha + n_randeffect - 1, S = 2 * v_alpha * diag(1 / param.a))) # exp of a-half -> positive only
   log_prior_a <- sum(invgamma::dinvgamma(param.a, scale = 0.5, shape = 1, log = TRUE))
 
