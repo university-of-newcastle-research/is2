@@ -102,16 +102,49 @@ prop_theta=rbind(proposals1,proposals2)
 ##### make it work
 
 #makes an array to store the IS samples
-tmp<-array(dim=c(IS_samples))
+tmp <- array(dim = c(IS_samples))
 
 #do the sampling
-if (cpus>1){
-  tmp <- mclapply(X=1:IS_samples,mc.cores = cpus, FUN = compute_lw, prop_theta = prop_theta,data = data,n_subjects= n_subjects,n_particles = n_particles,
-                  n_randeffect = n_randeffect,mu_tilde=mu_tilde,sigma_tilde = sigma_tilde, prior_dist=prior_dist_de, mix=mix, n.params=n.params)
-} else{
-  for (i in 1:IS_samples){
-    cat(i, sep="_")
-    tmp[i]<-compute_lw(prop_theta,data,n_subjects,n_particles, n_randeffect,mu_tilde,sigma_tilde,i,prior_dist=prior_dist_de, mix=mix, n.params=n.params)
+if (cpus > 1) {
+  tmp <- mclapply(
+    X = 1:IS_samples,
+    mc.cores = cpus,
+    FUN = compute_lw,
+    prop_theta = prop_theta,
+    data = data,
+    n_subjects = n_subjects,
+    n_particles = n_particles,
+    n_randeffect = n_randeffect,
+    mu_tilde = mu_tilde,
+    sigma_tilde = sigma_tilde,
+    prior_dist = prior_dist_de,
+    prior = prior,
+    group_dist = group_dist_de,
+    mix = mix,
+    n.params = n.params,
+    par.names = par.names,
+    ll_func = log.dens.like
+  )
+} else {
+  for (i in 1:IS_samples) {
+    cat(i, sep = "_")
+    tmp[i] <- compute_lw(
+      prop_theta,
+      data,
+      n_subjects,
+      n_particles,
+      n_randeffect,
+      mu_tilde,
+      sigma_tilde,
+      i,
+      prior_dist = prior_dist_de,
+      prior = prior,
+      group_dist = group_dist_de,
+      mix = mix,
+      n.params = n.params,
+      par.names = par.names,
+      ll_func = log.dens.like
+      )
   }
 }
 
