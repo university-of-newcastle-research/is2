@@ -178,4 +178,3 @@ var(log_marglik_boot)
 
 
 save.image("IS2_de_bs.Rdata")
-

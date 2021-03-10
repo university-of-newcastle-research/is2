@@ -150,7 +150,7 @@ prior_dist_de <- function(parameters, prior, n_randeffect, par.names) { ### mod 
   output <- 0
   for (pars in par.names) {
     output <- output + msm::dtnorm(theta.mu[pars], mean = prior[[pars]]$mu[1], sd = prior[[pars]]$mu[2], lower = 0, log = TRUE)
-    output <- output + stats::dgamma(param.theta.sig[pars], shape = prior[[pars]]$sig[1], rate = prior[[pars]]$sig[2], log = TRUE)
+    output <- output + stats::dgamma(theta.sig[pars], shape = prior[[pars]]$sig[1], rate = prior[[pars]]$sig[2], log = TRUE)
   }
   return(output)
 }
