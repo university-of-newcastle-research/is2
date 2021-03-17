@@ -5,7 +5,7 @@
 #' testing the functionality of the package.
 #'
 #'
-#' @format A pmwgs object with 427 samples, 19 subjects random effects and 
+#' @format A pmwgs object with 427 samples, 19 subjects random effects and
 #' 5 model parameters. A pmwgs object is a thin wrapper on a named list which
 #' contains the following (among other elements)
 #' \describe{
