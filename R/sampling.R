@@ -16,8 +16,8 @@
 #' @param group_dist - The specific calculation for the log density for the
 #'   group distribution
 #' @param mix - The calculated values for the importance mixing vars
-#' @param n.params - The number of parameters in total
-#' @param par.names - The names of each parameter
+#' @param n_params - The number of parameters in total
+#' @param par_names - The names of each parameter
 #' @param ll_func - The log lielihood function passed onto other functions
 #'
 #' @return The logweight of the importance samples
@@ -28,17 +28,17 @@ compute_lw <- function(prop_theta,
                        n_subjects,
                        n_particles,
                        n_randeffect,
-                       mu_tilde, 
+                       mu_tilde,
                        sigma_tilde,
                        i,
                        prior_dist,
                        prior,
                        group_dist,
                        mix,
-                       n.params,
-                       par.names,
+                       n_params,
+                       par_names,
                        ll_func) {
-  logp.out <- get_logp(
+  logp_out <- get_logp(
     prop_theta,
     data,
     n_subjects,
@@ -49,15 +49,15 @@ compute_lw <- function(prop_theta,
     i,
     ll_func,
     group_dist,
-    n.params,
-    par.names
+    n_params,
+    par_names
   )
   ## do equation 10
-  logw_num <- logp.out[1] + prior_dist(
+  logw_num <- logp_out[1] + prior_dist(
     parameters = prop_theta[i, ],
     prior,
     n_randeffect,
-    par.names
+    par_names
   )
   logw_den <- log(
     mix$lambda[1] * mvtnorm::dmvnorm(
@@ -96,7 +96,7 @@ compute_lw <- function(prop_theta,
 #'   given a set of parameter estimates
 #' @param group_dist - The specific calculation for the log density for the
 #'   group distribution
-#' @param n.params - The number of parameters in total
+#' @param n_params - The number of parameters in total
 #'
 #' @return Something or ther - not sure yet.
 #'
@@ -111,8 +111,8 @@ get_logp <- function(prop_theta,
                      i,
                      ll_func,
                      group_dist,
-                     n.params,
-                     par.names) {
+                     n_params,
+                     par_names) {
   # make an array for the density
   logp <- array(dim = c(n_particles, n_subjects))
   # ∀ subjects, get 1000 IS samples (particles) and find log weight of each
@@ -130,8 +130,8 @@ get_logp <- function(prop_theta,
       mean = mu_tilde[j, ],
       sigma = sigma_tilde[j, , ],
       dependent.ind = 1:n_randeffect,
-      given.ind = (n_randeffect + 1):n.params,
-      X.given = prop_theta[i, 1:(n.params - n_randeffect)]
+      given.ind = (n_randeffect + 1):n_params,
+      X.given = prop_theta[i, 1:(n_params - n_randeffect)]
     )
     particles1 <- mvtnorm::rmvnorm(
       n1,
@@ -151,7 +151,7 @@ get_logp <- function(prop_theta,
       x <- particles[k, ]
       # names for ll function to work
       # mod notes: this is the bit the prior effects
-      names(x) <- par.names
+      names(x) <- par_names
       # do lba log likelihood with given parameters for each subject,
       # gets density of particle from ll func
       logw_first <- ll_func(
@@ -227,24 +227,24 @@ group_dist_de <- function(random_effect = NULL,
   }
 }
 
-prior_dist_de <- function(parameters, prior, n_randeffect, par.names) {
+prior_dist_de <- function(parameters, prior, n_randeffect, par_names) {
   ### mod notes: the sampled$prior needs to be fixed/passed in some other time
-  theta.mu <- parameters[(1:n_randeffect) * 2 - 1]
-  names(theta.mu) <- par.names
+  theta_mu <- parameters[(1:n_randeffect) * 2 - 1]
+  names(theta_mu) <- par_names
   # needs par names
-  theta.sig <- parameters[(1:n_randeffect) * 2]
-  names(theta.sig) <- par.names
+  theta_sig <- parameters[(1:n_randeffect) * 2]
+  names(theta_sig) <- par_names
   output <- 0
-  for (pars in par.names) {
+  for (pars in par_names) {
     output <- output + msm::dtnorm(
-      theta.mu[pars],
+      theta_mu[pars],
       mean = prior[[pars]]$mu[1],
       sd = prior[[pars]]$mu[2],
       lower = 0,
       log = TRUE
     )
     output <- output + stats::dgamma(
-      theta.sig[pars],
+      theta_sig[pars],
       shape = prior[[pars]]$sig[1],
       rate = prior[[pars]]$sig[2],
       log = TRUE
@@ -279,13 +279,13 @@ group_dist_pmwg <- function(random_effect = NULL,
 prior_dist_pmwg <- function(parameters,
                             prior_parameters = NULL,
                             n_randeffect,
-                            par.names = NULL) {
+                            par_names = NULL) {
   theta_mu <- parameters[1:n_randeffect]
   theta_sig_unwound <- parameters[
     (n_randeffect + 1):(length(parameters) - n_randeffect)
   ] ## scott would like it to ask for n(unwind)
   theta_sig <- wind(theta_sig_unwound)
-  param.a <- exp(
+  param_a <- exp(
     parameters[((length(parameters) - n_randeffect) + 1):(length(parameters))]
   )
   v_alpha <- 2
@@ -299,17 +299,17 @@ prior_dist_pmwg <- function(parameters,
   log_prior_sigma <- log(MCMCpack::diwish(
     theta_sig,
     v = v_alpha + n_randeffect - 1,
-    S = 2 * v_alpha * diag(1 / param.a)
+    S = 2 * v_alpha * diag(1 / param_a)
   )) # exp of a-half -> positive only
   log_prior_a <- sum(invgamma::dinvgamma(
-    param.a,
+    param_a,
     scale = 0.5,
     shape = 1,
     log = TRUE
   ))
 
   # jacobian determinant of transformation of log of the a-half
-  logw_den2 <- sum(log(1 / param.a))
+  logw_den2 <- sum(log(1 / param_a))
   # jacobian determinant of cholesky factors of cov matrix
   logw_den3 <- log(2^n_randeffect) +
     sum((n_randeffect:1 + 1) * log(diag(theta_sig)))

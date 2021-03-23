@@ -17,8 +17,8 @@ compute_lw(
   prior,
   group_dist,
   mix,
-  n.params,
-  par.names,
+  n_params,
+  par_names,
   ll_func
 )
 }
@@ -51,9 +51,9 @@ group distribution}
 
 \item{mix}{- The calculated values for the importance mixing vars}
 
-\item{n.params}{- The number of parameters in total}
+\item{n_params}{- The number of parameters in total}
 
-\item{par.names}{- The names of each parameter}
+\item{par_names}{- The names of each parameter}
 
 \item{ll_func}{- The log lielihood function passed onto other functions}
 }

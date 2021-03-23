@@ -15,8 +15,8 @@ get_logp(
   i,
   ll_func,
   group_dist,
-  n.params,
-  par.names
+  n_params,
+  par_names
 )
 }
 \arguments{
@@ -44,7 +44,7 @@ given a set of parameter estimates}
 \item{group_dist}{- The specific calculation for the log density for the
 group distribution}
 
-\item{n.params}{- The number of parameters in total}
+\item{n_params}{- The number of parameters in total}
 }
 \value{
 Something or ther - not sure yet.
