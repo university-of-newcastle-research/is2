@@ -38,3 +38,5 @@ Meta
 
 #Cran submission
 pmwg.Rcheck/
+
+/*.RData

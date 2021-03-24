@@ -179,4 +179,4 @@ for (i in 1:bootstrap) {
 var(log_marglik_boot)
 
 
-save.image("IS2_de_bs.Rdata")
+save.image("IS2_de_bs.RData")

@@ -13,7 +13,7 @@ library(parallel)
 library(msm)
 devtools::load_all()
 
-load("forstmann_long.Rdata")
+load("forstmann_long.RData")
 message("Setup")
 cpus <- 1
 ###### set up variables #####
@@ -167,4 +167,4 @@ for (i in 1:bootstrap) {
 var(log_marglik_boot)
 
 
-save.image("IS2_v2.Rdata")
+save.image("IS2_v2.RData")
