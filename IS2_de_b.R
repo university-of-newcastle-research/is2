@@ -7,16 +7,18 @@ library(mvtnorm)
 library(MCMCpack)
 library(rtdists)
 library(invgamma)
+library(mixtools)
 library(condMVNorm)
 library(parallel)
 library(msm)
 devtools::load_all()
 
 load("b_fit.RData")
-burnin <- round(nmc / 2)
+message("Setup")
 cpus <- 1
 ###### set up variables #####
 # number of particles, samples, subjects, random effects etc
+burnin <- round(nmc / 2)
 n_randeffect <- length(theta[1, , 1, 1])
 n_subjects <- length(theta[1, 1, , 1])
 n_iter <- length(theta[1, 1, 1, ]) - burnin
@@ -24,9 +26,8 @@ n_iter <- length(theta[1, 1, 1, ]) - burnin
 importance_samples <- 100 # number of importance samples
 n_particles <- 100 # number of particles
 par_names <- names(theta[1, , 1, 1])
-hpar_names <- names(phi[1, , 1])
 
-
+message("Extract necessary samples")
 # grab the sampled stage of PMwG
 # store the random effects - theta
 theta_samples <- theta[, , , burnin:5000]
@@ -59,21 +60,30 @@ for (j in 1:n_subjects) {
   sigma_tilde[j, , ] <- cov(t(all_samples[j, , ]))
 }
 
-
-#### this is the same, just bind theta and phi together in the right order?
+message("Create parameter vector")
 parvector <- t(phi_samples)
-# do k=2, for a mixture of 2 gaussians (Davids suggestions, could be between
-# 1-5 really)
-k <- 2 # number of dists
 
+# do k=2, for a mixture of 2 gaussians
+# (Davids suggestions, could be between 1-5 really)
+k <- 2 # number of dists
+message("Estimate mix of gaussians")
 # mvnormalmixEM is a weak point - function can fail. needs a note or output to
 # show if it doesn't work. Should restart if it fails
 mix <- NULL
+save.image(file = "de_line74.RData")
 while (is.null(mix)) {
-  tryCatch(mix <- mixtools::mvnormalmixEM(parvector, k = k, maxit = 5000))
+  tryCatch(
+    mix <- mixtools::mvnormalmixEM(parvector, k = k, maxit = 5000),
+    error = function(e) {
+    },
+    finally = {
+    }
+  )
 }
 
+save.image(file = "de_line85.RData")
 #### generate the proposal parameters from the mix of importance samples  ####
+message("Get samples by weight")
 
 # use the weight to get samples for n1. n2 = samples-n1 (i.e 9000 and 1000)
 n1 <- rbinom(n = 1, size = importance_samples, prob = max(mix$lambda))
@@ -88,6 +98,7 @@ prop_theta <- rbind(proposals1, proposals2)
 
 # makes an array to store the IS samples
 tmp <- array(dim = c(importance_samples))
+message("Do importance Sampling")
 
 # Autofill the par.names for log.dens.like
 # log.dens.like comes from load("b_fit.RData")
@@ -141,7 +152,8 @@ if (cpus > 1) {
   }
 }
 
-save.image("IS2_de_bs.Rdata")
+
+save.image(file = "de_line157.RData")
 # get the ML value
 finished <- tmp
 tmp <- unlist(tmp)
@@ -151,6 +163,7 @@ mean_centred_lw <- mean(exp(tmp - max_lw))
 lw <- log(mean_centred_lw) + max_lw # puts max back on to get the lw
 
 
+message("Bootstrapping for Standard error")
 
 ##### bootstrapping for SE ######
 bootstrap <- 10000

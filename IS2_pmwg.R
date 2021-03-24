@@ -2,6 +2,7 @@
 
 ## set up environment and packages
 rm(list = ls())
+library(mixtools)
 library(mvtnorm)
 library(MCMCpack)
 library(rtdists)
@@ -9,9 +10,11 @@ library(invgamma)
 library(mixtools)
 library(condMVNorm)
 library(parallel)
+library(msm)
 devtools::load_all()
-load("forstmann_long.Rdata")
 
+load("forstmann_long.Rdata")
+message("Setup")
 cpus <- 1
 ###### set up variables #####
 # number of particles, samples, subjects, random effects etc
@@ -25,7 +28,7 @@ n_particles <- 10 # number of particles
 v_alpha <- 2 # ?
 pars <- sampled$pars
 
-
+message("Extract necessary samples")
 # grab the sampled stage of PMwG
 # store the random effects
 alpha <- sampled$samples$alpha[, , sampled$samples$stage == "sample"]
@@ -33,13 +36,10 @@ alpha <- sampled$samples$alpha[, , sampled$samples$stage == "sample"]
 theta <- sampled$samples$theta_mu[, sampled$samples$stage == "sample"]
 # store the cholesky transformed sigma
 sig <- sampled$samples$theta_sig[, , sampled$samples$stage == "sample"]
-# the a-hlaf is used in  calculating the Huang and Wand (2013) prior.
+# the a-half is used in calculating the Huang and Wand (2013) prior.
 # The a is a random sample from inv gamma which weights the inv wishart.
 # The mix of inverse wisharts is the prior on the correlation matrix
 a_half <- log(sampled$samples$a_half[, sampled$samples$stage == "sample"])
-
-
-
 
 # unwound sigma
 pts2_unwound <- apply(sig, 3, unwind)
@@ -47,7 +47,6 @@ n_params <- nrow(pts2_unwound) + n_randeffect + n_randeffect
 all_samples <- array(dim = c(n_subjects, n_params, n_iter))
 mu_tilde <- array(dim = c(n_subjects, n_params))
 sigma_tilde <- array(dim = c(n_subjects, n_params, n_params))
-
 
 for (j in 1:n_subjects) {
   all_samples[j, , ] <- rbind(alpha[, j, ], theta[, ], pts2_unwound[, ])
@@ -57,23 +56,30 @@ for (j in 1:n_subjects) {
   sigma_tilde[j, , ] <- cov(t(all_samples[j, , ]))
 }
 
-
-
+message("Create parameter vector")
 parvector <- cbind(t(theta), t(pts2_unwound), t(a_half))
 
 # do k=2, for a mixture of 2 gaussians
 # (Davids suggestions, could be between 1-5 really)
 k <- 2 # number of dists
-
+message("Estimate mix of gaussians")
 # mvnormalmixEM is a weak point - function can fail. needs a note or output to
 # show if it doesn't work. Should restart if it fails
 mix <- NULL
-
+save.image(file = "pmwg_line71.RData")
 while (is.null(mix)) {
-  tryCatch(mix <- mvnormalmixEM(parvector, k = k, maxit = 5000))
+  tryCatch(
+    mix <- mixtools::mvnormalmixEM(parvector, k = k, maxit = 5000),
+    error = function(e) {
+    },
+    finally = {
+    }
+  )
 }
 
+save.image(file = "pmwg_line76.RData")
 #### generate the proposal parameters from the mix of importance samples  ####
+message("Get samples by weight")
 
 # use the weight to get samples for n1. n2 = samples-n1 (i.e 9000 and 1000)
 n1 <- rbinom(n = 1, size = importance_samples, prob = max(mix$lambda))
@@ -88,6 +94,7 @@ prop_theta <- rbind(proposals1, proposals2)
 
 # makes an array to store the IS samples
 tmp <- array(dim = c(importance_samples))
+message("Do importance Sampling")
 
 # do the sampling
 if (cpus > 1) {
@@ -134,6 +141,7 @@ if (cpus > 1) {
 }
 
 
+save.image(file = "pmwg_line138.RData")
 # get the ML value
 finished <- tmp
 tmp <- unlist(tmp)
@@ -143,6 +151,7 @@ mean_centred_lw <- mean(exp(tmp - max_lw))
 lw <- log(mean_centred_lw) + max_lw # puts max back on to get the lw
 
 
+message("Bootstrapping for Standard error")
 
 ##### bootstrapping for SE ######
 bootstrap <- 10000
