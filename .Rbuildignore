@@ -3,3 +3,5 @@
 
 ^.github/
 ^data-raw$
+
+_pkgdown.yml

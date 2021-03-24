@@ -97,6 +97,8 @@ compute_lw <- function(prop_theta,
 #' @param group_dist - The specific calculation for the log density for the
 #'   group distribution
 #' @param n_params - The number of parameters in total
+#' @param par_names - The name of each parameter in the order they appear in the
+#'   parameter arrays
 #'
 #' @return Something or ther - not sure yet.
 #'

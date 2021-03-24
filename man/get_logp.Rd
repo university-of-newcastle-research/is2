@@ -45,6 +45,9 @@ given a set of parameter estimates}
 group distribution}
 
 \item{n_params}{- The number of parameters in total}
+
+\item{par_names}{- The name of each parameter in the order they appear in the
+parameter arrays}
 }
 \value{
 Something or ther - not sure yet.
