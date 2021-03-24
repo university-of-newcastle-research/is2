@@ -2,3 +2,4 @@
 
 export(compute_lw)
 export(get_logp)
+export(summarise)

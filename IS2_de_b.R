@@ -131,7 +131,7 @@ if (cpus > 1) {
   )
 } else {
   for (i in 1:importance_samples) {
-    cat(i, sep = "_")
+    cat(i, " ")
     tmp[i] <- compute_lw(
       prop_theta,
       data,
@@ -151,32 +151,13 @@ if (cpus > 1) {
     )
   }
 }
+cat("\n")
 
+message("Get Maximum Likelihood and Bootstrap for Standard error")
 
-save.image(file = "de_line157.RData")
-# get the ML value
-finished <- tmp
-tmp <- unlist(tmp)
-max_lw <- max(tmp)
-# takes off the max and gets mean (avoids infs)
-mean_centred_lw <- mean(exp(tmp - max_lw))
-lw <- log(mean_centred_lw) + max_lw # puts max back on to get the lw
+save.image(file = "pmwg_line138.RData")
 
+summary_like <- summarise(tmp)
+print(summary_like)
 
-message("Bootstrapping for Standard error")
-
-##### bootstrapping for SE ######
-bootstrap <- 10000
-log_marglik_boot <- array(dim = bootstrap)
-for (i in 1:bootstrap) {
-  # resample with replacement from the lw
-  log_weight_boot <- sample(tmp, importance_samples, replace = TRUE)
-  max_boot <- max(log_weight_boot)
-  # takes off the max and gets mean (avoids infs)
-  centred_boot <- mean(exp(log_weight_boot - max_boot))
-  log_marglik_boot[i] <- log(centred_boot) + max_boot # puts max back on
-}
-var(log_marglik_boot)
-
-
-save.image("IS2_de_bs.RData")
+save.image("IS2_de_bs_2.RData")
