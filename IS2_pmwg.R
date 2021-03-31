@@ -16,66 +16,15 @@ devtools::load_all()
 load("forstmann_long.RData")
 message("Setup")
 cpus <- 1
-###### set up variables #####
-# number of particles, samples, subjects, random effects etc
-n_randeffect <- sampled$n_pars
-n_subjects <- sampled$n_subjects
-n_iter <- length(sampled$samples$stage[sampled$samples$stage == "sample"])
-# length of the full transformed random effect vector and/or parameter vector
-length_draws <- sampled$samples$idx
 importance_samples <- 100 # number of importance samples
 n_particles <- 10 # number of particles
-v_alpha <- 2 # ?
 pars <- sampled$pars
 
 message("Extract necessary samples")
-# grab the sampled stage of PMwG
-# store the random effects
-alpha <- sampled$samples$alpha[, , sampled$samples$stage == "sample"]
-# store the mu
-theta <- sampled$samples$theta_mu[, sampled$samples$stage == "sample"]
-# store the cholesky transformed sigma
-sig <- sampled$samples$theta_sig[, , sampled$samples$stage == "sample"]
-# the a-half is used in calculating the Huang and Wand (2013) prior.
-# The a is a random sample from inv gamma which weights the inv wishart.
-# The mix of inverse wisharts is the prior on the correlation matrix
-a_half <- log(sampled$samples$a_half[, sampled$samples$stage == "sample"])
 
-# unwound sigma
-pts2_unwound <- apply(sig, 3, unwind)
-n_params <- nrow(pts2_unwound) + n_randeffect + n_randeffect
-all_samples <- array(dim = c(n_subjects, n_params, n_iter))
-mu_tilde <- array(dim = c(n_subjects, n_params))
-sigma_tilde <- array(dim = c(n_subjects, n_params, n_params))
-
-for (j in 1:n_subjects) {
-  all_samples[j, , ] <- rbind(alpha[, j, ], theta[, ], pts2_unwound[, ])
-  # calculate the mean for re, mu and sigma
-  mu_tilde[j, ] <- apply(all_samples[j, , ], 1, mean)
-  # calculate the covariance matrix for random effects, mu and sigma
-  sigma_tilde[j, , ] <- cov(t(all_samples[j, , ]))
-}
 
 message("Create parameter vector")
-parvector <- cbind(t(theta), t(pts2_unwound), t(a_half))
 
-# do k=2, for a mixture of 2 gaussians
-# (Davids suggestions, could be between 1-5 really)
-k <- 2 # number of dists
-message("Estimate mix of gaussians")
-# mvnormalmixEM is a weak point - function can fail. needs a note or output to
-# show if it doesn't work. Should restart if it fails
-mix <- NULL
-save.image(file = "pmwg_line71.RData")
-while (is.null(mix)) {
-  tryCatch(
-    mix <- mixtools::mvnormalmixEM(parvector, k = k, maxit = 5000),
-    error = function(e) {
-    },
-    finally = {
-    }
-  )
-}
 
 save.image(file = "pmwg_line76.RData")
 #### generate the proposal parameters from the mix of importance samples  ####
@@ -104,9 +53,9 @@ if (cpus > 1) {
     FUN = compute_lw,
     prop_theta = prop_theta,
     data = data,
-    n_subjects = n_subjects,
+    n_subjects = x$n_subjects,
     n_particles = n_particles,
-    n_randeffect = n_randeffect,
+    n_randeffect = x$n_pars,
     mu_tilde = mu_tilde,
     sigma_tilde = sigma_tilde,
     prior_dist = prior_dist_pmwg,
@@ -123,9 +72,9 @@ if (cpus > 1) {
     tmp[i] <- compute_lw(
       prop_theta,
       data,
-      n_subjects,
+      x$n_subjects,
       n_particles,
-      n_randeffect,
+      x$n_pars,
       mu_tilde,
       sigma_tilde,
       i,
