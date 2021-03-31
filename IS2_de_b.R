@@ -91,7 +91,6 @@ n1 <- pmax(n1, 2)
 n1 <- pmin(n1, importance_samples - 2)
 n2 <- importance_samples - n1
 
-# generates the 10,000 IS proposals given the mix
 proposals1 <- rmvnorm(n1, mix$mu[[1]], mix$sigma[[1]])
 proposals2 <- rmvnorm(n2, mix$mu[[2]], mix$sigma[[2]])
 prop_theta <- rbind(proposals1, proposals2)

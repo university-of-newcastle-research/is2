@@ -15,3 +15,17 @@ mix_gaussian <- function(parvector, k = 2, maxit = 5000) {
   }
   mix
 }
+
+
+get_proposals <- function(mix, importance_samples) {
+  #### generate the proposal parameters from the mix of importance samples  ####
+  # use the weight to get samples for n1. n2 = samples-n1 (i.e 9000 and 1000)
+  n1 <- rbinom(n = 1, size = importance_samples, prob = max(mix$lambda))
+  n1 <- pmax(n1, 2)
+  n1 <- pmin(n1, importance_samples - 2)
+  n2 <- importance_samples - n1
+
+  proposals1 <- mvtnorm::rmvnorm(n1, mix$mu[[1]], mix$sigma[[1]])
+  proposals2 <- mvtnorm::rmvnorm(n2, mix$mu[[2]], mix$sigma[[2]])
+  prop_theta <- rbind(proposals1, proposals2)
+}

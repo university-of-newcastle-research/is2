@@ -264,7 +264,7 @@ group_dist_pmwg <- function(random_effect = NULL,
   theta_sig_unwound <- parameters[
     (n_randeffect + 1):(length(parameters) - n_randeffect)
   ]
-  theta_sig <- wind(theta_sig_unwound)
+  theta_sig <- pmwg:::wind(theta_sig_unwound)
   if (sample) {
     return(mvtnorm::rmvnorm(n_samples, theta_mu, theta_sig))
   } else {
@@ -286,7 +286,7 @@ prior_dist_pmwg <- function(parameters,
   theta_sig_unwound <- parameters[
     (n_randeffect + 1):(length(parameters) - n_randeffect)
   ] ## scott would like it to ask for n(unwind)
-  theta_sig <- wind(theta_sig_unwound)
+  theta_sig <- pmwg:::wind(theta_sig_unwound)
   param_a <- exp(
     parameters[((length(parameters) - n_randeffect) + 1):(length(parameters))]
   )
