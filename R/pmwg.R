@@ -10,6 +10,12 @@ is2.pmwgs <- function(x, ...) {
     )
   }
 
+  samples <- extract_pmwgs(x)
+  mix <- mix_gaussian(samples$parvector)
+
+}
+
+extract_pmwgs <- function(x) {
   # grab the sampled stage of PMwG
   # store the random effects
   alpha <- sampled$samples$alpha[, , sampled$samples$stage == "sample"]
@@ -37,11 +43,9 @@ is2.pmwgs <- function(x, ...) {
   }
 
   parvector <- cbind(t(theta), t(pts2_unwound), t(a_half))
-  parvector2 <- cbind(
-    as_mcmc(sampled, filter="sample"),
-    apply(as_mcmc(sampled, selection = "theta_sig", filter="sample"), 3, unwind),
-    t(log(sampled$samples$a_half[, sampled$samples$stage == "sample"]))
+  list(
+    mu_tilde = mu_tilde,
+    sigma_tilde = sigma_tilde,
+    parvector = parvector)
   )
 }
-
-

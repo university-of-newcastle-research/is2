@@ -18,18 +18,15 @@ message("Setup")
 cpus <- 1
 importance_samples <- 100 # number of importance samples
 n_particles <- 10 # number of particles
-pars <- sampled$pars
 
 message("Extract necessary samples")
+samples <- extract_pmwgs(x)
 
+save.image(file = "pmwg2_line25.RData")
+message("Get mix of gaussians")
+mix <- mix_gaussian(samples$parvector)
 
-message("Create parameter vector")
-
-
-save.image(file = "pmwg_line76.RData")
 #### generate the proposal parameters from the mix of importance samples  ####
-message("Get samples by weight")
-
 # use the weight to get samples for n1. n2 = samples-n1 (i.e 9000 and 1000)
 n1 <- rbinom(n = 1, size = importance_samples, prob = max(mix$lambda))
 n1 <- pmax(n1, 2)
@@ -83,8 +80,8 @@ if (cpus > 1) {
       group_dist = group_dist_pmwg,
       mix = mix,
       n_params = n_params,
-      par_names = sampled$par_names,
-      ll_func = sampled$ll_func
+      par_names = x$par_names,
+      ll_func = x$ll_func
     )
   }
 }
@@ -92,9 +89,9 @@ cat("\n")
 
 message("Get Maximum Likelihood and Bootstrap for Standard error")
 
-save.image(file = "pmwg_line138.RData")
+save.image(file = "pmwg2_line92.RData")
 
 summary_like <- summarise(tmp)
 print(summary_like)
 
-save.image("IS2_v2_2.RData")
+save.image("IS2_pmwg2.RData")
