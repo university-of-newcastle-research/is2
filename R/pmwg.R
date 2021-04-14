@@ -50,20 +50,20 @@ is2.pmwgs <- function(x, n_isamples, n_particles, n_cpus = 1, ...) {
       mc.cores = n_cpus,
       FUN = compute_lw,
       prop_theta = prop_theta,
+      n_particles = n_particles,
+      mix = mix,
+      prior_dist = prior_dist_pmwg,
+      group_dist = group_dist_pmwg,
+      show = TRUE,
       data = x$data,
       n_subjects = x$n_subjects,
-      n_particles = n_particles,
       n_randeffect = x$n_pars,
-      mu_tilde = samples$mu_tilde,
-      sigma_tilde = samples$sigma_tilde,
-      prior_dist = prior_dist_pmwg,
       prior = x$prior,
-      group_dist = group_dist_pmwg,
-      mix = mix,
-      n_params = samples$n_params,
       par_names = x$par_names,
       ll_func = x$ll_func,
-      show = TRUE
+      mu_tilde = samples$mu_tilde,
+      sigma_tilde = samples$sigma_tilde,
+      n_params = samples$n_params,
     )
   )
   is2 <- list(
