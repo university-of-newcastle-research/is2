@@ -7,11 +7,13 @@
 #' @param n_isamples The number of importance samples to generate
 #' @param n_particles The number of particles to generate for each iteration of
 #'   the is2 process
+#' @param n_cpus The number of cpus available for parallel processing
+#' @param ... Other arguments passed to methods
 #'
 #' @return An isample object with the importance samples.
 #'
 #' @export
-is2 <- function(x, n_isamples, n_particles, ...) {
+is2 <- function(x, n_isamples, n_particles, n_cpus = 1, ...) {
   UseMethod("is2", x)
 }
 
@@ -23,11 +25,13 @@ is2 <- function(x, n_isamples, n_particles, ...) {
 #' @param n_isamples The number of importance samples to generate
 #' @param n_particles The number of particles to generate for each iteration of
 #'   the is2 process
+#' @param n_cpus The number of cpus available for parallel processing
+#' @param ... Other arguments passed to methods
 #'
 #' @return An isample object with the importance samples.
 #'
 #' @export
-is2.pmwgs <- function(x, n_isamples, n_particles, ...) {
+is2.pmwgs <- function(x, n_isamples, n_particles, n_cpus = 1, ...) {
   if (!requireNamespace("pmwg", quietly = TRUE)) {
     stop(
       "Package \"pmwg\" needed for this function to work. Please install it.",
@@ -41,11 +45,11 @@ is2.pmwgs <- function(x, n_isamples, n_particles, ...) {
   # Calculate importance samples for pmwgs object
   samples <- unlist(
     parallel::mclapply(
-      X = 1:importance_samples,
-      mc.cores = cpus,
+      X = 1:n_isamples,
+      mc.cores = n_cpus,
       FUN = compute_lw,
       prop_theta = prop_theta,
-      data = data,
+      data = x$data,
       n_subjects = x$n_subjects,
       n_particles = n_particles,
       n_randeffect = x$n_pars,
@@ -99,7 +103,7 @@ extract_pmwgs <- function(x) {
     # calculate the mean for re, mu and sigma
     mu_tilde[j, ] <- apply(subject_samples, 1, mean)
     # calculate the covariance matrix for random effects, mu and sigma
-    sigma_tilde[j, , ] <- cov(t(subject_samples))
+    sigma_tilde[j, , ] <- stats::cov(t(subject_samples))
   }
 
   parvector <- cbind(t(theta), t(pts2_unwound), t(a_half))

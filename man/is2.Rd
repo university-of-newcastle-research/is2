@@ -4,7 +4,7 @@
 \alias{is2}
 \title{Generic function for calculating importance samples}
 \usage{
-is2(x, n_isamples, n_particles, ...)
+is2(x, n_isamples, n_particles, n_cpus = 1, ...)
 }
 \arguments{
 \item{x}{The vector of parameter estimates you are working with}
@@ -13,6 +13,10 @@ is2(x, n_isamples, n_particles, ...)
 
 \item{n_particles}{The number of particles to generate for each iteration of
 the is2 process}
+
+\item{n_cpus}{The number of cpus available for parallel processing}
+
+\item{...}{Other arguments passed to methods}
 }
 \value{
 An isample object with the importance samples.

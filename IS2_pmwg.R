@@ -3,7 +3,6 @@ devtools::load_all()
 
 load("forstmann_long.RData")
 message("Setup")
-cpus <- 1
 importance_samples <- 100 # number of importance samples
 n_particles <- 10 # number of particles
 
