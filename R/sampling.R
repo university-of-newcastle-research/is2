@@ -19,6 +19,7 @@
 #' @param n_params - The number of parameters in total
 #' @param par_names - The names of each parameter
 #' @param ll_func - The log lielihood function passed onto other functions
+#' @param show - Set to TRUE to show feedback after each call
 #'
 #' @return The logweight of the importance samples
 #'
@@ -37,7 +38,8 @@ compute_lw <- function(prop_theta,
                        mix,
                        n_params,
                        par_names,
-                       ll_func) {
+                       ll_func,
+                       show = FALSE) {
   logp_out <- get_logp(
     prop_theta,
     data,
@@ -72,6 +74,9 @@ compute_lw <- function(prop_theta,
     )
   ) # density of proposed params under the means
   logw <- logw_num - logw_den # this is the equation 10
+  if (show) {
+    cat(".")
+  }
   return(c(logw))
   # NOTE: we should leave a note if variance is shit -
   # variance is given by the logp function (currently commented out)

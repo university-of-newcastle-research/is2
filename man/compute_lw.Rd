@@ -19,7 +19,8 @@ compute_lw(
   mix,
   n_params,
   par_names,
-  ll_func
+  ll_func,
+  show = FALSE
 )
 }
 \arguments{
@@ -56,6 +57,8 @@ group distribution}
 \item{par_names}{- The names of each parameter}
 
 \item{ll_func}{- The log lielihood function passed onto other functions}
+
+\item{show}{- Set to TRUE to show feedback after each call}
 }
 \value{
 The logweight of the importance samples

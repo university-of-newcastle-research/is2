@@ -62,7 +62,8 @@ is2.pmwgs <- function(x, n_isamples, n_particles, n_cpus = 1, ...) {
       mix = mix,
       n_params = samples$n_params,
       par_names = x$par_names,
-      ll_func = x$ll_func
+      ll_func = x$ll_func,
+      show = TRUE
     )
   )
   is2 <- list(

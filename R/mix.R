@@ -23,7 +23,12 @@ mix_gaussian <- function(parvector, k = 2, maxit = 5000) {
   mix <- NULL
   while (is.null(mix)) {
     tryCatch(
-      mix <- mixtools::mvnormalmixEM(parvector, k = k, maxit = maxit),
+      mix <- mixtools::mvnormalmixEM(
+        parvector,
+        k = k,
+        maxit = maxit,
+        verb = TRUE
+      ),
       error = function(e) {
       },
       finally = {
