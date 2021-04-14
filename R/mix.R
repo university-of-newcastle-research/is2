@@ -4,7 +4,11 @@
 #' create a mixture of `k` gaussians used in the importance sampling to generate
 #' proposals (particles) from the importance sampling distribution.
 #'
-#' @param parvector A vector containing
+#' The parvector cn be a difficult array to create, as it's exact structure
+#' depends on the prior_dist
+#'
+#' @param parvector A 2D array with rows = sampler iterations and columns being
+#'   the model parameter estimates and other samples necessary.
 #' @param k The number of multivariate gaussians to estimate in the mixture
 #' @param maxit The maximum number of iterations to pass to `mvnormalmixEM`
 #'
