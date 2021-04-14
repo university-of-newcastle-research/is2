@@ -1,3 +1,16 @@
+#' Create a mixture of gaussians for importance sampling
+#'
+#' A slow process, that fails regularly - uses `mixtools::mvnormalmixEM` to
+#' create a mixture of `k` gaussians used in the importance sampling to generate
+#' proposals (particles) from the importance sampling distribution.
+#'
+#' @param parvector A vector containing
+#' @param k The number of multivariate gaussians to estimate in the mixture
+#' @param maxit The maximum number of iterations to pass to `mvnormalmixEM`
+#'
+#' @return A mix object containing mu and sigma for each gaussian in mix
+#'
+#' @export
 mix_gaussian <- function(parvector, k = 2, maxit = 5000) {
   # do k=2, for a mixture of 2 gaussians
   # (Davids suggestions, could be between 1-5 really)

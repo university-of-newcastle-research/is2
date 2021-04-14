@@ -1,7 +1,32 @@
+#' Generic function for calculating importance samples
+#'
+#' Should be used by creating a S3 method (`is2.object`) for your specific
+#' object.
+#'
+#' @param x The vector of parameter estimates you are working with
+#' @param n_isamples The number of importance samples to generate
+#' @param n_particles The number of particles to generate for each iteration of
+#'   the is2 process
+#'
+#' @return An isample object with the importance samples.
+#'
+#' @export
 is2 <- function(x, n_isamples, n_particles, ...) {
   UseMethod("is2", x)
 }
 
+#' S3 method for calculating importance samples for pmwgs objects
+#'
+#' Calculates importance samples for a pmwgs object (from the `pmwg` package)
+#'
+#' @param x The vector of parameter estimates you are working with
+#' @param n_isamples The number of importance samples to generate
+#' @param n_particles The number of particles to generate for each iteration of
+#'   the is2 process
+#'
+#' @return An isample object with the importance samples.
+#'
+#' @export
 is2.pmwgs <- function(x, n_isamples, n_particles, ...) {
   if (!requireNamespace("pmwg", quietly = TRUE)) {
     stop(
@@ -38,8 +63,8 @@ is2.pmwgs <- function(x, n_isamples, n_particles, ...) {
   is2 <- list(
     samples = samples
   )
-  class(is2) <- "is2"
-  sampler
+  class(is2) <- "isample"
+  is2
 }
 
 
@@ -50,8 +75,6 @@ is2.pmwgs <- function(x, n_isamples, n_particles, ...) {
 #' @param x The pmwgs object passed from is2 generic function
 #'
 #' @return A list with various samples, possibly reshaped
-#'
-#' @import
 extract_pmwgs <- function(x) {
   # grab the sampled stage of PMwG
   # store the random effects

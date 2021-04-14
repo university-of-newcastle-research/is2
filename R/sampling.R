@@ -190,14 +190,6 @@ get_logp <- function(prop_theta,
   w <- exp(logw)
   subj_logp <- log(apply(w, 2, mean)) + sub_max # means
 
-  # this part gets the variance the same as David
-  # has been commented out here, but could be an option to use this
-  # var_numerator = apply(w^2, 2, sum)
-  # var_denominator = apply(w, 2, sum)^2
-  # variance
-  # logp_variance = (var_numerator/var_denominator) - (1/n_particles)
-  # for each subject
-
   # sum the logp and return
   return(sum(subj_logp))
 }
