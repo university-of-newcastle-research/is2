@@ -17,6 +17,7 @@ is2 <- function(x, n_isamples, n_particles, n_cpus = 1, ...) {
   UseMethod("is2", x)
 }
 
+
 #' S3 method for calculating importance samples for pmwgs objects
 #'
 #' Calculates importance samples for a pmwgs object (from the `pmwg` package)

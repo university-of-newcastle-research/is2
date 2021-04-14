@@ -1,7 +1,7 @@
 # PMWGS test script
 devtools::load_all()
 
-load("forstmann_long.RData")
+load(here::here("scratch", "forstmann_long.RData"))
 message("Setup")
 importance_samples <- 100 # number of importance samples
 n_particles <- 10 # number of particles
@@ -13,4 +13,4 @@ message("Get Maximum Likelihood and Bootstrap for Standard error")
 summary_like <- summarise(importance_samples)
 print(summary_like)
 
-save.image("IS2_pmwg2.RData")
+save.image(here::here("scratch", "IS2_pmwg2.RData"))
