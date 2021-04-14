@@ -7,7 +7,8 @@
 mix_gaussian(parvector, k = 2, maxit = 5000)
 }
 \arguments{
-\item{parvector}{A vector containing}
+\item{parvector}{A 2D array with rows = sampler iterations and columns being
+the model parameter estimates and other samples necessary.}
 
 \item{k}{The number of multivariate gaussians to estimate in the mixture}
 
@@ -20,4 +21,8 @@ A mix object containing mu and sigma for each gaussian in mix
 A slow process, that fails regularly - uses `mixtools::mvnormalmixEM` to
 create a mixture of `k` gaussians used in the importance sampling to generate
 proposals (particles) from the importance sampling distribution.
+}
+\details{
+The parvector cn be a difficult array to create, as it's exact structure
+depends on the prior_dist
 }
