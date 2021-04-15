@@ -2,64 +2,52 @@
 #'
 #' @param prop_theta - the proposals for theta_mu, the group level model
 #'   parameter estimates
-#' @param data - the data used to create the estimates
-#' @param n_subjects - The number of subjects from the data
 #' @param n_particles - the number of particles to draw for each importance
 #'   sample.
-#' @param n_randeffect - the number of parameters that has been estimated
-#' @param mu_tilde - The mean for each subjects random effects
-#' @param sigma_tilde - The covsriance matrix for each subjects random effects
+#' @param subj_est - A named list containing the mean `mu` vector and covariance
+#'   matrices `sigma` of each subjects random effects as well as the number of
+#'   parameters used for the random effect estimates.
 #' @param i - The index for the importance sample being calculated
-#' @param prior_dist - The specific calculation for the log density of the prior
-#'   distrobution
-#' @param prior - the specification of the prior
-#' @param group_dist - The specific calculation for the log density for the
-#'   group distribution
+#' @param dist_funcs - A named list with the specific calculation for the log
+#'   density of the `prior` and `group` distribution
+#' @param samples - The object containing original data, model design (number of
+#'   subjects, number of parameters and parameter names), the specification of
+#'   the prior and thelog likelihood function used to generate the model
+#'   estimates.
 #' @param mix - The calculated values for the importance mixing vars
-#' @param n_params - The number of parameters in total
-#' @param par_names - The names of each parameter
-#' @param ll_func - The log lielihood function passed onto other functions
 #' @param show - Set to TRUE to show feedback after each call
 #'
 #' @return The logweight of the importance samples
 #'
 #' @export
 compute_lw <- function(prop_theta,
-                       data,
-                       n_subjects,
                        n_particles,
-                       n_randeffect,
-                       mu_tilde,
-                       sigma_tilde,
+                       subj_est,
                        i,
-                       prior_dist,
-                       prior,
-                       group_dist,
+                       dist_funcs,
                        mix,
-                       n_params,
-                       par_names,
-                       ll_func,
+                       samples,
                        show = FALSE) {
   logp_out <- get_logp(
     prop_theta,
-    data,
-    n_subjects,
+    samples$data,
+    samples$n_subjects,
     n_particles,
-    n_randeffect,
-    mu_tilde,
-    sigma_tilde,
+    samples$n_randeffect,
+    subj_est$mu_tilde,
+    subj_est$sigma_tilde,
     i,
-    ll_func,
-    group_dist,
-    n_params,
-    par_names
+    samples$ll_func,
+    dist_funcs$group,
+    subj_est$n_params,
+    samples$par_names
   )
   ## do equation 10
-  logw_num <- logp_out[1] + prior_dist(
+  logw_num <- logp_out[1] + dist_funcs$prior(
     parameters = prop_theta[i, ],
-    prior,
-    n_randeffect,
-    par_names
+    samples$prior,
+    samples$n_randeffect,
+    samples$par_names
   )
   logw_den <- log(
     mix$lambda[1] * mvtnorm::dmvnorm(
