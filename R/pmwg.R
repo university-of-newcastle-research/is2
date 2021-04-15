@@ -63,7 +63,7 @@ is2.pmwgs <- function(x, n_isamples, n_particles, n_cpus = 1, ...) {
       ll_func = x$ll_func,
       mu_tilde = samples$mu_tilde,
       sigma_tilde = samples$sigma_tilde,
-      n_params = samples$n_params,
+      n_params = samples$n_params
     )
   )
   is2 <- list(

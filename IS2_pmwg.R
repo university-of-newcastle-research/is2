@@ -13,4 +13,4 @@ message("Get Maximum Likelihood and Bootstrap for Standard error")
 summary_like <- summarise(importance_samples)
 print(summary_like)
 
-save.image(here::here("scratch", "IS2_pmwg2.RData"))
+save.image(here::here("scratch", "IS2_pmwg3.RData"))
