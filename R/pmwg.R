@@ -43,6 +43,7 @@ is2.pmwgs <- function(x, n_isamples, n_particles, n_cpus = 1, ...) {
   samples <- extract_pmwgs(x)
   mix <- mix_gaussian(samples$parvector)
   prop_theta <- get_proposals(mix, n_isamples)
+  dist_functions <- list(group = group_dist_pmwg, prior = prior_dist_pmwg)
   # Calculate importance samples for pmwgs object
   samples <- unlist(
     parallel::mclapply(
@@ -53,7 +54,7 @@ is2.pmwgs <- function(x, n_isamples, n_particles, n_cpus = 1, ...) {
       n_particles = n_particles,
       subj_est = samples,
       mix = mix,
-      dist_functions = dist_functions,
+      dist_funcs = dist_functions,
       samples = x,
       show = TRUE,
     )
