@@ -46,7 +46,7 @@ compute_lw <- function(prop_theta,
   logw_num <- logp_out[1] + dist_funcs$prior(
     parameters = prop_theta[i, ],
     samples$prior,
-    samples$n_randeffect,
+    samples$n_pars,
     samples$par_names
   )
   logw_den <- log(
