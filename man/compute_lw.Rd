@@ -8,7 +8,6 @@ compute_lw(
   prop_theta,
   n_particles,
   subj_est,
-  i,
   dist_funcs,
   mix,
   samples,
@@ -16,7 +15,7 @@ compute_lw(
 )
 }
 \arguments{
-\item{prop_theta}{- the proposals for theta_mu, the group level model
+\item{prop_theta}{- one proposals for theta_mu, the group level model
 parameter estimates}
 
 \item{n_particles}{- the number of particles to draw for each importance
@@ -25,8 +24,6 @@ sample.}
 \item{subj_est}{- A named list containing the mean `mu` vector and covariance
 matrices `sigma` of each subjects random effects as well as the number of
 parameters used for the random effect estimates.}
-
-\item{i}{- The index for the importance sample being calculated}
 
 \item{dist_funcs}{- A named list with the specific calculation for the log
 density of the `prior` and `group` distribution}

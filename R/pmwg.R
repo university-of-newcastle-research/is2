@@ -47,10 +47,9 @@ is2.pmwgs <- function(x, n_isamples, n_particles, n_cpus = 1, ...) {
   # Calculate importance samples for pmwgs object
   samples <- unlist(
     parallel::mclapply(
-      X = 1:n_isamples,
+      X = split(prop_theta, row(prop_theta)),
       mc.cores = n_cpus,
       FUN = compute_lw,
-      prop_theta = prop_theta,
       n_particles = n_particles,
       subj_est = samples,
       mix = mix,
