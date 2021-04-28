@@ -27,12 +27,14 @@ is2 <- function(x, n_isamples, n_particles, n_cpus = 1, ...) {
 #' @param n_particles The number of particles to generate for each iteration of
 #'   the is2 process
 #' @param n_cpus The number of cpus available for parallel processing
+#' @param precomputed_mix A mix of gaussians created using the `mix_gaussian`
+#'   function and `parvector` element of the `extract_pmwgs` output.
 #' @param ... Other arguments passed to methods
 #'
 #' @return An isample object with the importance samples.
 #'
 #' @export
-is2.pmwgs <- function(x, n_isamples, n_particles, n_cpus = 1, ...) {
+is2.pmwgs <- function(x, n_isamples, n_particles, n_cpus = 1, precomputed_mix = NULL, ...) {
   if (!requireNamespace("pmwg", quietly = TRUE)) {
     stop(
       "Package \"pmwg\" needed for this function to work. Please install it.",
@@ -41,7 +43,11 @@ is2.pmwgs <- function(x, n_isamples, n_particles, n_cpus = 1, ...) {
   }
 
   samples <- extract_pmwgs(x)
-  mix <- mix_gaussian(samples$parvector)
+  if (is.null(precomputed_mix)) {
+    mix <- mix_gaussian(samples$parvector)
+  } else {
+    mix <- precomputed_mix
+  }
   prop_theta <- get_proposals(mix, n_isamples)
   dist_functions <- list(group = group_dist_pmwg, prior = prior_dist_pmwg)
   # Calculate importance samples for pmwgs object
