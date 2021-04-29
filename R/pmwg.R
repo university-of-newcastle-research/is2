@@ -3,7 +3,7 @@
 #' Should be used by creating a S3 method (`is2.object`) for your specific
 #' object.
 #'
-#' @param x The vector of parameter estimates you are working with
+#' @param x The sampling object you wish to draw importance samples from
 #' @param n_isamples The number of importance samples to generate
 #' @param n_particles The number of particles to generate for each iteration of
 #'   the is2 process
@@ -22,19 +22,12 @@ is2 <- function(x, n_isamples, n_particles, n_cpus = 1, ...) {
 #'
 #' Calculates importance samples for a pmwgs object (from the `pmwg` package)
 #'
-#' @param x The vector of parameter estimates you are working with
-#' @param n_isamples The number of importance samples to generate
-#' @param n_particles The number of particles to generate for each iteration of
-#'   the is2 process
-#' @param n_cpus The number of cpus available for parallel processing
-#' @param precomputed_mix A mix of gaussians created using the `mix_gaussian`
-#'   function and `parvector` element of the `extract_pmwgs` output.
-#' @param ... Other arguments passed to methods
+#' @inheritParams is2
 #'
 #' @return An isample object with the importance samples.
 #'
 #' @export
-is2.pmwgs <- function(x, n_isamples, n_particles, n_cpus = 1, precomputed_mix = NULL, ...) {
+is2.pmwgs <- function(x, n_isamples, n_particles, n_cpus = 1, ...) {
   if (!requireNamespace("pmwg", quietly = TRUE)) {
     stop(
       "Package \"pmwg\" needed for this function to work. Please install it.",
@@ -43,10 +36,11 @@ is2.pmwgs <- function(x, n_isamples, n_particles, n_cpus = 1, precomputed_mix = 
   }
 
   samples <- extract_pmwgs(x)
-  if (is.null(precomputed_mix)) {
+  dots <- list(...)
+  if (is.null(dots$precomputed_mix)) {
     mix <- mix_gaussian(samples$parvector)
   } else {
-    mix <- precomputed_mix
+    mix <- dots$precomputed_mix
   }
   prop_theta <- get_proposals(mix, n_isamples)
   dist_functions <- list(group = group_dist_pmwg, prior = prior_dist_pmwg)
