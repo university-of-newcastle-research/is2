@@ -28,16 +28,10 @@ compute_lw <- function(prop_theta,
                        show = FALSE) {
   logp_out <- get_logp(
     prop_theta,
-    samples$data,
-    samples$n_subjects,
+    samples,
     n_particles,
-    samples$n_pars,
-    subj_est$mu_tilde,
-    subj_est$sigma_tilde,
-    samples$ll_func,
-    dist_funcs$group,
-    subj_est$n_params,
-    samples$par_names
+    subj_est,
+    dist_funcs$group
   )
   ## do equation 10
   logw_num <- logp_out[1] + dist_funcs$prior(
@@ -74,39 +68,25 @@ compute_lw <- function(prop_theta,
 #'
 #' @param prop_theta - the proposals for theta_mu, the group level model
 #'   parameter estimates
-#' @param data - the data used to create the estimates
-#' @param n_subjects - The number of subjects from the data
+#' @param sampler - the object which holds the information about the sampling
+#'   process, including log likelihood function, data, n_subjects etc
 #' @param n_particles - the number of particles to draw for each importance
 #'   sample.
-#' @param n_randeffect - the number of parameters that has been estimated
-#' @param mu_tilde - The mean for each subjects random effects
-#' @param sigma_tilde - The covsriance matrix for each subjects random effects
-#' @param ll_func - The log likelihood function to get likelihood of the data
-#'   given a set of parameter estimates
 #' @param group_dist - The specific calculation for the log density for the
 #'   group distribution
-#' @param n_params - The number of parameters in total
-#' @param par_names - The name of each parameter in the order they appear in the
-#'   parameter arrays
 #'
 #' @return Something or ther - not sure yet.
 #'
 #' @export
 get_logp <- function(prop_theta,
-                     data,
-                     n_subjects,
+                     sampler,
                      n_particles,
-                     n_randeffect,
-                     mu_tilde,
-                     sigma_tilde,
-                     ll_func,
-                     group_dist,
-                     n_params,
-                     par_names) {
+                     subj_est,
+                     group_dist) {
   # make an array for the density
-  logp <- array(dim = c(n_particles, n_subjects))
+  logp <- array(dim = c(n_particles, sampler$n_subjects))
   # ∀ subjects, get 1000 IS samples (particles) and find log weight of each
-  for (j in 1:n_subjects) {
+  for (j in 1:sampler$n_subjects) {
     # generate the particles from the conditional MVnorm AND
     # a mix of group level proposals
     wmix <- 0.95
@@ -117,11 +97,11 @@ get_logp <- function(prop_theta,
     n2 <- n_particles - n1
     # do conditional MVnorm based on the proposal distribution
     conditional <- condMVNorm::condMVN(
-      mean = mu_tilde[j, ],
-      sigma = sigma_tilde[j, , ],
-      dependent.ind = 1:n_randeffect,
-      given.ind = (n_randeffect + 1):n_params,
-      X.given = prop_theta[1:(n_params - n_randeffect)]
+      mean = subj_est$mu_tilde[j, ],
+      sigma = subj_est$sigma_tilde[j, , ],
+      dependent.ind = 1:sampler$n_pars,
+      given.ind = (sampler$n_pars + 1):subj_est$n_params,
+      X.given = prop_theta[1:(subj_est$n_params - sampler$n_pars)]
     )
     particles1 <- mvtnorm::rmvnorm(
       n1,
@@ -133,7 +113,7 @@ get_logp <- function(prop_theta,
       n_samples = n2,
       parameters = prop_theta,
       sample = TRUE,
-      n_randeffect = n_randeffect
+      n_randeffect = sampler$n_pars
     )
     particles <- rbind(particles1, particles2)
 
@@ -141,12 +121,12 @@ get_logp <- function(prop_theta,
       x <- particles[k, ]
       # names for ll function to work
       # mod notes: this is the bit the prior effects
-      names(x) <- par_names
+      names(x) <- sampler$par_names
       # do lba log likelihood with given parameters for each subject,
       # gets density of particle from ll func
-      logw_first <- ll_func(
+      logw_first <- sampler$ll_func(
         x,
-        data = data[as.numeric(factor(data$subject)) == j, ]
+        data = sampler$data[as.numeric(factor(sampler$data$subject)) == j, ]
       ) # mod notes: do we pass this in or the whole sampled object????
       # below gets second part of eq'n 5 numerator ie density under prop_theta
       # particle k and big vector of things
@@ -154,7 +134,7 @@ get_logp <- function(prop_theta,
         random_effect = particles[k, ],
         parameters = prop_theta,
         sample = FALSE,
-        n_randeffect = n_randeffect
+        n_randeffect = sampler$n_pars
       ) # mod notes: group dist
       # below is the denominator - ie mix of density under conditional and
       # density under pro_theta
