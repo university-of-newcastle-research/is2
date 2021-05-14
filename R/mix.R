@@ -4,7 +4,7 @@
 #' create a mixture of `k` gaussians used in the importance sampling to generate
 #' proposals (particles) from the importance sampling distribution.
 #'
-#' The parvector cn be a difficult array to create, as it's exact structure
+#' The parvector can be a difficult array to create, as its exact structure
 #' depends on the prior_dist
 #'
 #' @param parvector A 2D array with rows = sampler iterations and columns being
