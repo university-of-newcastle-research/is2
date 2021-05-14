@@ -38,6 +38,7 @@ mix_gaussian <- function(parvector, k = 2, maxit = 5000) {
   mix
 }
 
+
 #' Gets proposal mvnormal samples based on mix of gaussians
 #'
 #' Currently assumes that the mix of gaussians was generated with k = 2

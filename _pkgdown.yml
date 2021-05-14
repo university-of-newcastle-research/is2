@@ -3,19 +3,28 @@ reference:
 - title: Package
   desc:  Top level package documentation
 - contents:
-  - pmwg
+  - is2-package
 - title: Sampling
-  desc: Functions for creating a sampler object and running the Particle Metropolis within Gibbs estimation methods.
+  desc: Functions for creating a importance sampling object and running the Importance Sampling Squared methods.
 - contents:
-  - pmwgs
-  - is.pmwgs
-  - run_stage
-  - init
+  - is2
+  - is2.pmwgs
+  - extract_pmwgs
+- title: Internals
+  desc: Functions used during importance sampling to compute the log weights, get log probability for random effects and more. You should not need to used these functions for most use cases.
+- contents:
+  - compute_lw
+  - get_logp
 - title: Data Access
-  desc: Functions for accessing and exporting samples in easy to work with formats.
+  desc: Functions for accessing and exporting and summarising importance samples in easy to work with formats.
 - contents:
-  - as_mcmc
+  - summarise
+- title: Mix
+  desc: Functions for creating a mix of importance sampling distributions
+- contents:
+  - mix_gaussian
+  - get_proposals
 - title: Datasets
   desc: Data included in the package
 - contents:
-  - forstmann
+  - sdt_samples
