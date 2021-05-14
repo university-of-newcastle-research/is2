@@ -72,6 +72,9 @@ compute_lw <- function(prop_theta,
 #'   process, including log likelihood function, data, n_subjects etc
 #' @param n_particles - the number of particles to draw for each importance
 #'   sample.
+#' @param subj_est - A named list containing the mean `mu` vector and covariance
+#'   matrices `sigma` of each subjects random effects as well as the number of
+#'   parameters used for the random effect estimates.
 #' @param group_dist - The specific calculation for the log density for the
 #'   group distribution
 #'

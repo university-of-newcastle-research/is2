@@ -4,10 +4,10 @@
 \alias{is2.pmwgs}
 \title{S3 method for calculating importance samples for pmwgs objects}
 \usage{
-\method{is2}{pmwgs}(x, n_isamples, n_particles, n_cpus = 1, precomputed_mix = NULL, ...)
+\method{is2}{pmwgs}(x, n_isamples, n_particles, n_cpus = 1, ...)
 }
 \arguments{
-\item{x}{The vector of parameter estimates you are working with}
+\item{x}{The sampling object you wish to draw importance samples from}
 
 \item{n_isamples}{The number of importance samples to generate}
 
@@ -15,9 +15,6 @@
 the is2 process}
 
 \item{n_cpus}{The number of cpus available for parallel processing}
-
-\item{precomputed_mix}{A mix of gaussians created using the `mix_gaussian`
-function and `parvector` element of the `extract_pmwgs` output.}
 
 \item{...}{Other arguments passed to methods}
 }

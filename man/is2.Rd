@@ -7,7 +7,7 @@
 is2(x, n_isamples, n_particles, n_cpus = 1, ...)
 }
 \arguments{
-\item{x}{The vector of parameter estimates you are working with}
+\item{x}{The sampling object you wish to draw importance samples from}
 
 \item{n_isamples}{The number of importance samples to generate}
 

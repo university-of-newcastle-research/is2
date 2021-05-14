@@ -23,6 +23,6 @@ create a mixture of `k` gaussians used in the importance sampling to generate
 proposals (particles) from the importance sampling distribution.
 }
 \details{
-The parvector cn be a difficult array to create, as it's exact structure
+The parvector can be a difficult array to create, as its exact structure
 depends on the prior_dist
 }

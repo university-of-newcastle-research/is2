@@ -4,47 +4,24 @@
 \alias{get_logp}
 \title{Calculate the log probability of the data given the xxx}
 \usage{
-get_logp(
-  prop_theta,
-  data,
-  n_subjects,
-  n_particles,
-  n_randeffect,
-  mu_tilde,
-  sigma_tilde,
-  ll_func,
-  group_dist,
-  n_params,
-  par_names
-)
+get_logp(prop_theta, sampler, n_particles, subj_est, group_dist)
 }
 \arguments{
 \item{prop_theta}{- the proposals for theta_mu, the group level model
 parameter estimates}
 
-\item{data}{- the data used to create the estimates}
-
-\item{n_subjects}{- The number of subjects from the data}
+\item{sampler}{- the object which holds the information about the sampling
+process, including log likelihood function, data, n_subjects etc}
 
 \item{n_particles}{- the number of particles to draw for each importance
 sample.}
 
-\item{n_randeffect}{- the number of parameters that has been estimated}
-
-\item{mu_tilde}{- The mean for each subjects random effects}
-
-\item{sigma_tilde}{- The covsriance matrix for each subjects random effects}
-
-\item{ll_func}{- The log likelihood function to get likelihood of the data
-given a set of parameter estimates}
+\item{subj_est}{- A named list containing the mean `mu` vector and covariance
+matrices `sigma` of each subjects random effects as well as the number of
+parameters used for the random effect estimates.}
 
 \item{group_dist}{- The specific calculation for the log density for the
 group distribution}
-
-\item{n_params}{- The number of parameters in total}
-
-\item{par_names}{- The name of each parameter in the order they appear in the
-parameter arrays}
 }
 \value{
 Something or ther - not sure yet.
