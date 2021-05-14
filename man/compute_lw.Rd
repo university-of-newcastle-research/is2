@@ -6,56 +6,36 @@
 \usage{
 compute_lw(
   prop_theta,
-  data,
-  n_subjects,
   n_particles,
-  n_randeffect,
-  mu_tilde,
-  sigma_tilde,
-  i,
-  prior_dist,
-  prior,
-  group_dist,
+  subj_est,
+  dist_funcs,
   mix,
-  n_params,
-  par_names,
-  ll_func
+  samples,
+  show = FALSE
 )
 }
 \arguments{
-\item{prop_theta}{- the proposals for theta_mu, the group level model
+\item{prop_theta}{- one proposals for theta_mu, the group level model
 parameter estimates}
-
-\item{data}{- the data used to create the estimates}
-
-\item{n_subjects}{- The number of subjects from the data}
 
 \item{n_particles}{- the number of particles to draw for each importance
 sample.}
 
-\item{n_randeffect}{- the number of parameters that has been estimated}
+\item{subj_est}{- A named list containing the mean `mu` vector and covariance
+matrices `sigma` of each subjects random effects as well as the number of
+parameters used for the random effect estimates.}
 
-\item{mu_tilde}{- The mean for each subjects random effects}
-
-\item{sigma_tilde}{- The covsriance matrix for each subjects random effects}
-
-\item{i}{- The index for the importance sample being calculated}
-
-\item{prior_dist}{- The specific calculation for the log density of the prior
-distrobution}
-
-\item{prior}{- the specification of the prior}
-
-\item{group_dist}{- The specific calculation for the log density for the
-group distribution}
+\item{dist_funcs}{- A named list with the specific calculation for the log
+density of the `prior` and `group` distribution}
 
 \item{mix}{- The calculated values for the importance mixing vars}
 
-\item{n_params}{- The number of parameters in total}
+\item{samples}{- The object containing original data, model design (number of
+subjects, number of parameters and parameter names), the specification of
+the prior and thelog likelihood function used to generate the model
+estimates.}
 
-\item{par_names}{- The names of each parameter}
-
-\item{ll_func}{- The log lielihood function passed onto other functions}
+\item{show}{- Set to TRUE to show feedback after each call}
 }
 \value{
 The logweight of the importance samples

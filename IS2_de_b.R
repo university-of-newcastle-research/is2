@@ -13,7 +13,7 @@ library(parallel)
 library(msm)
 devtools::load_all()
 
-load("b_fit.RData")
+load(here::here("scratch", "b_fit.RData"))
 message("Setup")
 cpus <- 1
 ###### set up variables #####
@@ -70,7 +70,7 @@ message("Estimate mix of gaussians")
 # mvnormalmixEM is a weak point - function can fail. needs a note or output to
 # show if it doesn't work. Should restart if it fails
 mix <- NULL
-save.image(file = "de_line74.RData")
+save.image(file = here::here("scratch", "de_line74.RData"))
 while (is.null(mix)) {
   tryCatch(
     mix <- mixtools::mvnormalmixEM(parvector, k = k, maxit = 5000),
@@ -81,7 +81,7 @@ while (is.null(mix)) {
   )
 }
 
-save.image(file = "de_line85.RData")
+save.image(file = here::here("scratch", "de_line85.RData"))
 #### generate the proposal parameters from the mix of importance samples  ####
 message("Get samples by weight")
 
@@ -91,7 +91,6 @@ n1 <- pmax(n1, 2)
 n1 <- pmin(n1, importance_samples - 2)
 n2 <- importance_samples - n1
 
-# generates the 10,000 IS proposals given the mix
 proposals1 <- rmvnorm(n1, mix$mu[[1]], mix$sigma[[1]])
 proposals2 <- rmvnorm(n2, mix$mu[[2]], mix$sigma[[2]])
 prop_theta <- rbind(proposals1, proposals2)
@@ -155,9 +154,9 @@ cat("\n")
 
 message("Get Maximum Likelihood and Bootstrap for Standard error")
 
-save.image(file = "pmwg_line138.RData")
+save.image(file = here::here("scratch", "pmwg_line138.RData"))
 
 summary_like <- summarise(tmp)
 print(summary_like)
 
-save.image("IS2_de_bs_2.RData")
+save.image(here::here("scratch", "IS2_de_bs_2.RData"))

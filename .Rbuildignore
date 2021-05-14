@@ -5,3 +5,6 @@
 ^data-raw$
 
 _pkgdown.yml
+
+^tags
+^scratch/

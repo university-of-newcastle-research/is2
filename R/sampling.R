@@ -1,77 +1,61 @@
 #' Calculate importance samples
 #'
-#' @param prop_theta - the proposals for theta_mu, the group level model
+#' @param prop_theta - one proposals for theta_mu, the group level model
 #'   parameter estimates
-#' @param data - the data used to create the estimates
-#' @param n_subjects - The number of subjects from the data
 #' @param n_particles - the number of particles to draw for each importance
 #'   sample.
-#' @param n_randeffect - the number of parameters that has been estimated
-#' @param mu_tilde - The mean for each subjects random effects
-#' @param sigma_tilde - The covsriance matrix for each subjects random effects
-#' @param i - The index for the importance sample being calculated
-#' @param prior_dist - The specific calculation for the log density of the prior
-#'   distrobution
-#' @param prior - the specification of the prior
-#' @param group_dist - The specific calculation for the log density for the
-#'   group distribution
+#' @param subj_est - A named list containing the mean `mu` vector and covariance
+#'   matrices `sigma` of each subjects random effects as well as the number of
+#'   parameters used for the random effect estimates.
+#' @param dist_funcs - A named list with the specific calculation for the log
+#'   density of the `prior` and `group` distribution
+#' @param samples - The object containing original data, model design (number of
+#'   subjects, number of parameters and parameter names), the specification of
+#'   the prior and thelog likelihood function used to generate the model
+#'   estimates.
 #' @param mix - The calculated values for the importance mixing vars
-#' @param n_params - The number of parameters in total
-#' @param par_names - The names of each parameter
-#' @param ll_func - The log lielihood function passed onto other functions
+#' @param show - Set to TRUE to show feedback after each call
 #'
 #' @return The logweight of the importance samples
 #'
 #' @export
 compute_lw <- function(prop_theta,
-                       data,
-                       n_subjects,
                        n_particles,
-                       n_randeffect,
-                       mu_tilde,
-                       sigma_tilde,
-                       i,
-                       prior_dist,
-                       prior,
-                       group_dist,
+                       subj_est,
+                       dist_funcs,
                        mix,
-                       n_params,
-                       par_names,
-                       ll_func) {
+                       samples,
+                       show = FALSE) {
   logp_out <- get_logp(
     prop_theta,
-    data,
-    n_subjects,
+    samples,
     n_particles,
-    n_randeffect,
-    mu_tilde,
-    sigma_tilde,
-    i,
-    ll_func,
-    group_dist,
-    n_params,
-    par_names
+    subj_est,
+    dist_funcs$group
   )
   ## do equation 10
-  logw_num <- logp_out[1] + prior_dist(
-    parameters = prop_theta[i, ],
-    prior,
-    n_randeffect,
-    par_names
+  logw_num <- logp_out[1] + dist_funcs$prior(
+    parameters = prop_theta,
+    samples$prior,
+    samples$n_pars,
+    samples$par_names
   )
   logw_den <- log(
     mix$lambda[1] * mvtnorm::dmvnorm(
-      prop_theta[i, ],
+      prop_theta,
       mix$mu[[1]],
       mix$sigma[[1]]
     ) +
     mix$lambda[2] * mvtnorm::dmvnorm(
-      prop_theta[i, ],
+      prop_theta,
       mix$mu[[2]],
       mix$sigma[[2]]
     )
   ) # density of proposed params under the means
   logw <- logw_num - logw_den # this is the equation 10
+  if (show) {
+    cat(".")
+  }
   return(c(logw))
   # NOTE: we should leave a note if variance is shit -
   # variance is given by the logp function (currently commented out)
@@ -84,41 +68,25 @@ compute_lw <- function(prop_theta,
 #'
 #' @param prop_theta - the proposals for theta_mu, the group level model
 #'   parameter estimates
-#' @param data - the data used to create the estimates
-#' @param n_subjects - The number of subjects from the data
+#' @param sampler - the object which holds the information about the sampling
+#'   process, including log likelihood function, data, n_subjects etc
 #' @param n_particles - the number of particles to draw for each importance
 #'   sample.
-#' @param n_randeffect - the number of parameters that has been estimated
-#' @param mu_tilde - The mean for each subjects random effects
-#' @param sigma_tilde - The covsriance matrix for each subjects random effects
-#' @param i - The index for the importance sample being calculated
-#' @param ll_func - The log likelihood function to get likelihood of the data
-#'   given a set of parameter estimates
 #' @param group_dist - The specific calculation for the log density for the
 #'   group distribution
-#' @param n_params - The number of parameters in total
-#' @param par_names - The name of each parameter in the order they appear in the
-#'   parameter arrays
 #'
 #' @return Something or ther - not sure yet.
 #'
 #' @export
 get_logp <- function(prop_theta,
-                     data,
-                     n_subjects,
+                     sampler,
                      n_particles,
-                     n_randeffect,
-                     mu_tilde,
-                     sigma_tilde,
-                     i,
-                     ll_func,
-                     group_dist,
-                     n_params,
-                     par_names) {
+                     subj_est,
+                     group_dist) {
   # make an array for the density
-  logp <- array(dim = c(n_particles, n_subjects))
+  logp <- array(dim = c(n_particles, sampler$n_subjects))
   # ∀ subjects, get 1000 IS samples (particles) and find log weight of each
-  for (j in 1:n_subjects) {
+  for (j in 1:sampler$n_subjects) {
     # generate the particles from the conditional MVnorm AND
     # a mix of group level proposals
     wmix <- 0.95
@@ -129,11 +97,11 @@ get_logp <- function(prop_theta,
     n2 <- n_particles - n1
     # do conditional MVnorm based on the proposal distribution
     conditional <- condMVNorm::condMVN(
-      mean = mu_tilde[j, ],
-      sigma = sigma_tilde[j, , ],
-      dependent.ind = 1:n_randeffect,
-      given.ind = (n_randeffect + 1):n_params,
-      X.given = prop_theta[i, 1:(n_params - n_randeffect)]
+      mean = subj_est$mu_tilde[j, ],
+      sigma = subj_est$sigma_tilde[j, , ],
+      dependent.ind = 1:sampler$n_pars,
+      given.ind = (sampler$n_pars + 1):subj_est$n_params,
+      X.given = prop_theta[1:(subj_est$n_params - sampler$n_pars)]
     )
     particles1 <- mvtnorm::rmvnorm(
       n1,
@@ -143,9 +111,9 @@ get_logp <- function(prop_theta,
     # mix of proposal params and conditional
     particles2 <- group_dist(
       n_samples = n2,
-      parameters = prop_theta[i, ],
+      parameters = prop_theta,
       sample = TRUE,
-      n_randeffect = n_randeffect
+      n_randeffect = sampler$n_pars
     )
     particles <- rbind(particles1, particles2)
 
@@ -153,20 +121,20 @@ get_logp <- function(prop_theta,
       x <- particles[k, ]
       # names for ll function to work
       # mod notes: this is the bit the prior effects
-      names(x) <- par_names
+      names(x) <- sampler$par_names
       # do lba log likelihood with given parameters for each subject,
       # gets density of particle from ll func
-      logw_first <- ll_func(
+      logw_first <- sampler$ll_func(
         x,
-        data = data[as.numeric(factor(data$subject)) == j, ]
+        data = sampler$data[as.numeric(factor(sampler$data$subject)) == j, ]
       ) # mod notes: do we pass this in or the whole sampled object????
       # below gets second part of eq'n 5 numerator ie density under prop_theta
       # particle k and big vector of things
       logw_second <- group_dist(
         random_effect = particles[k, ],
-        parameters = prop_theta[i, ],
+        parameters = prop_theta,
         sample = FALSE,
-        n_randeffect = n_randeffect
+        n_randeffect = sampler$n_pars
       ) # mod notes: group dist
       # below is the denominator - ie mix of density under conditional and
       # density under pro_theta
@@ -189,14 +157,6 @@ get_logp <- function(prop_theta,
   logw <- t(t(logp) - sub_max)
   w <- exp(logw)
   subj_logp <- log(apply(w, 2, mean)) + sub_max # means
-
-  # this part gets the variance the same as David
-  # has been commented out here, but could be an option to use this
-  # var_numerator = apply(w^2, 2, sum)
-  # var_denominator = apply(w, 2, sum)^2
-  # variance
-  # logp_variance = (var_numerator/var_denominator) - (1/n_particles)
-  # for each subject
 
   # sum the logp and return
   return(sum(subj_logp))
@@ -264,7 +224,7 @@ group_dist_pmwg <- function(random_effect = NULL,
   theta_sig_unwound <- parameters[
     (n_randeffect + 1):(length(parameters) - n_randeffect)
   ]
-  theta_sig <- wind(theta_sig_unwound)
+  theta_sig <- pmwg:::wind(theta_sig_unwound)
   if (sample) {
     return(mvtnorm::rmvnorm(n_samples, theta_mu, theta_sig))
   } else {
@@ -286,7 +246,7 @@ prior_dist_pmwg <- function(parameters,
   theta_sig_unwound <- parameters[
     (n_randeffect + 1):(length(parameters) - n_randeffect)
   ] ## scott would like it to ask for n(unwind)
-  theta_sig <- wind(theta_sig_unwound)
+  theta_sig <- pmwg:::wind(theta_sig_unwound)
   param_a <- exp(
     parameters[((length(parameters) - n_randeffect) + 1):(length(parameters))]
   )

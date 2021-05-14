@@ -40,3 +40,5 @@ Meta
 pmwg.Rcheck/
 
 /*.RData
+tags
+scratch/

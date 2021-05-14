@@ -12,7 +12,6 @@ get_logp(
   n_randeffect,
   mu_tilde,
   sigma_tilde,
-  i,
   ll_func,
   group_dist,
   n_params,
@@ -35,8 +34,6 @@ sample.}
 \item{mu_tilde}{- The mean for each subjects random effects}
 
 \item{sigma_tilde}{- The covsriance matrix for each subjects random effects}
-
-\item{i}{- The index for the importance sample being calculated}
 
 \item{ll_func}{- The log likelihood function to get likelihood of the data
 given a set of parameter estimates}
