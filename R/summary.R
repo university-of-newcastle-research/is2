@@ -28,7 +28,7 @@ summarise <- function(isamples, se_boot = 10000) {
     log_marglik_boot[i] <- log(centred_boot) + max_boot # puts max back on
   }
   list(
-    maximum_likelihood = lw,
+    marginal_likelihood = lw,
     variance = stats::var(log_marglik_boot)
   )
 }
