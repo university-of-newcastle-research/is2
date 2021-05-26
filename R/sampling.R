@@ -129,7 +129,7 @@ get_logp <- function(prop_theta,
       # gets density of particle from ll func
       logw_first <- sampler$ll_func(
         x,
-        data = sampler$data[as.numeric(factor(sampler$data$subject)) == j, ]
+        data = sampler$data[sampler$data$subject == sampler$subjects[j], ]
       ) # mod notes: do we pass this in or the whole sampled object????
       # below gets second part of eq'n 5 numerator ie density under prop_theta
       # particle k and big vector of things
