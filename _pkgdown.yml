@@ -18,7 +18,7 @@ reference:
 - title: Data Access
   desc: Functions for accessing and exporting and summarising importance samples in easy to work with formats.
 - contents:
-  - summarise
+  - summary.isample
 - title: Mix
   desc: Functions for creating a mix of importance sampling distributions
 - contents:
