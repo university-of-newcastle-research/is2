@@ -1,4 +1,4 @@
-# is2 - Importance Sampling Squared
+# is2 - Importance Sampling Squared <img src="man/figures/hexlogo_small.png" align="right"/> #
 
 Importance Sampling Squared is a package designed to take the output of a `pmwg` Particle Metropolis within Gibbs (a set of model parameter and random effect estimates) and calculate the marginal likelihood of the model using Importance Sampling.
 
