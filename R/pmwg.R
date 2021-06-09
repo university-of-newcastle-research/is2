@@ -94,6 +94,10 @@ extract_pmwgs <- function(x) {
     mu_tilde[j, ] <- apply(subject_samples, 1, mean)
     # calculate the covariance matrix for random effects, mu and sigma
     sigma_tilde[j, , ] <- stats::cov(t(subject_samples))
+    #this checks that the sigma_tilde is pos def and if not, makes it pos def
+    if(!corpcor::is.positive.definite(sigma_tilde[i,,], tol=1e-8)){
+      sigma_tilde[i,,]<-corpcor::make.positive.definite(sigma_tilde[i,,], tol=1e-6)
+    }
   }
 
   parvector <- cbind(t(theta), t(pts2_unwound), t(a_half))
