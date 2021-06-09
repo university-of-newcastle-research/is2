@@ -279,7 +279,7 @@ prior_dist_pmwg <- function(parameters,
     sigma = prior_parameters$theta_mu_var,
     log = TRUE
   )
-  log_prior_sigma <- log(MCMCpack::diwish(
+  log_prior_sigma <- log(robust_diwish(
     theta_sig,
     v = v_alpha + n_randeffect - 1,
     S = 2 * v_alpha * diag(1 / param_a)
@@ -298,4 +298,40 @@ prior_dist_pmwg <- function(parameters,
     sum((n_randeffect:1 + 1) * log(diag(theta_sig)))
 
   return(log_prior_mu + log_prior_sigma + log_prior_a + logw_den3 - logw_den2)
+}
+
+#robust iwish for bad samples - returns 1-e10 if not pos def
+robust_diwish <- function(W, v, S) {
+  # W = param.theta.sig2
+  # v=v_alpha+ n_randeffect-1
+  # S = 2*v_alpha*diag(1/param.a)  #exp of a-half -> positive only
+  if (!is.matrix(S))
+    S <- matrix(S)
+  if (nrow(S) != ncol(S)) {
+    stop("S not square in diwish().\n")
+  }
+  if (!is.matrix(W))
+    W <- matrix(W)
+  if (nrow(W) != ncol(W)) {
+    stop("W not square in diwish().\n")
+  }
+  if (nrow(S) != ncol(W)) {
+    stop("W and X of different dimensionality in diwish().\n")
+  }
+  if (v < nrow(S)) {
+    stop("v is less than the dimension of S in  diwish().\n")
+  }
+  p <- nrow(S)
+  gammapart <- sum(lgamma((v + 1 - 1:p) / 2))
+  ldenom <- gammapart + 0.5 * v * p * log(2) + 0.25 * p * (p - 1) * log(pi)
+  cholS <- chol(S)
+
+  cholW <- tryCatch(chol(W), error = return(1e-10))
+  halflogdetS <- sum(log(diag(cholS)))
+  halflogdetW <- sum(log(diag(cholW)))
+  invW <- chol2inv(cholW)
+  exptrace <- sum(S * invW)
+  lnum <- v * halflogdetS - (v + p + 1) * halflogdetW - 0.5 * exptrace
+  lpdf <- lnum - ldenom
+  return(exp(lpdf))
 }
