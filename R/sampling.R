@@ -177,7 +177,10 @@ get_logp <- function(prop_theta,
   subj_logp <- log(apply(w, 2, mean)) + sub_max # means
 
   # sum the logp and return
-  return(sum(subj_logp))
+  if(is.nan(sum(subj_logp))) {
+    return(1e-10)
+  }
+  sum(subj_logp)
 }
 
 group_dist_de <- function(random_effect = NULL,
