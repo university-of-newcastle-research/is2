@@ -13,7 +13,6 @@
 #'   subjects, number of parameters and parameter names), the specification of
 #'   the prior and thelog likelihood function used to generate the model
 #'   estimates.
-#' @param mix - The calculated values for the importance mixing vars
 #' @param show - Set to TRUE to show feedback after each call
 #'
 #' @return The logweight of the importance samples
@@ -23,7 +22,6 @@ compute_lw <- function(prop_theta,
                        n_particles,
                        subj_est,
                        dist_funcs,
-                       mix,
                        samples,
                        show = FALSE) {
   logp_out <- get_logp(
@@ -40,18 +38,35 @@ compute_lw <- function(prop_theta,
     samples$n_pars,
     samples$par_names
   )
-  logw_den <- log(
-    mix$lambda[1] * mvtnorm::dmvnorm(
+  if (is.null(attr(prop_theta, "mix"))) {
+    if (is.null(attr(prop_theta, "mu")) | is.null(attr(prop_theta, "sigma"))) {
+      stop("Proposals generated from t distribution should have mu/sigma attr")
+    }
+    mu <- attr(prop_theta, "mu")
+    sigma <- attr(prop_theta, "sigma")
+    logw_den <- mvtnorm::dmvt(
       prop_theta,
-      mix$mu[[1]],
-      mix$sigma[[1]]
-    ) +
-    mix$lambda[2] * mvtnorm::dmvnorm(
-      prop_theta,
-      mix$mu[[2]],
-      mix$sigma[[2]]
+      delta = mu,
+      sigma = sigma,
+      df = 1,
+      log = TRUE
     )
-  ) # density of proposed params under the means
+  } else {
+    # Have generated prpoposals from a mixture of gaussians
+    mix <- attr(prop_theta, "mix")
+    logw_den <- log(
+      mix$lambda[1] * mvtnorm::dmvnorm(
+        prop_theta,
+        mix$mu[[1]],
+        mix$sigma[[1]]
+      ) +
+      mix$lambda[2] * mvtnorm::dmvnorm(
+        prop_theta,
+        mix$mu[[2]],
+        mix$sigma[[2]]
+      )
+    ) # density of proposed params under the means
+  }
   logw <- logw_num - logw_den # this is the equation 10
   if (show) {
     cat(".")

@@ -36,13 +36,9 @@ is2.pmwgs <- function(x, n_isamples, n_particles, n_cpus = 1, ...) {
   }
 
   samples <- extract_pmwgs(x)
-  dots <- list(...)
-  if (is.null(dots$precomputed_mix)) {
-    mix <- mix_gaussian(samples$parvector)
-  } else {
-    mix <- dots$precomputed_mix
-  }
-  prop_theta <- get_proposals(mix, n_isamples)
+  dots <- list(...)  # Other parameters used for proposal generation
+  prop_theta <- get_proposals(samples$par_vector, n_isamples, dots)
+
   dist_functions <- list(group = group_dist_pmwg, prior = prior_dist_pmwg)
   # Calculate importance samples for pmwgs object
   samples <- unlist(
