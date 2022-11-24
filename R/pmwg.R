@@ -37,7 +37,7 @@ is2.pmwgs <- function(x, n_isamples, n_particles, n_cpus = 1, ...) {
 
   samples <- extract_pmwgs(x)
   dots <- list(...)  # Other parameters used for proposal generation
-  prop_theta <- get_proposals(samples$par_vector, n_isamples, dots)
+  prop_theta <- get_proposals(samples$parvector, n_isamples, dots)
 
   dist_functions <- list(group = group_dist_pmwg, prior = prior_dist_pmwg)
   # Calculate importance samples for pmwgs object
