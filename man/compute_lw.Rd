@@ -9,7 +9,6 @@ compute_lw(
   n_particles,
   subj_est,
   dist_funcs,
-  mix,
   samples,
   show = FALSE
 )
@@ -27,8 +26,6 @@ parameters used for the random effect estimates.}
 
 \item{dist_funcs}{- A named list with the specific calculation for the log
 density of the `prior` and `group` distribution}
-
-\item{mix}{- The calculated values for the importance mixing vars}
 
 \item{samples}{- The object containing original data, model design (number of
 subjects, number of parameters and parameter names), the specification of

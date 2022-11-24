@@ -1,6 +1,6 @@
 Package: is2
 Title: Importance Sampling Squared
-Version: 0.0.2.9000
+Version: 0.0.2.9001
 Authors@R: c(
     person("Gavin", "Cooper", email = "gavin@gavincooper.net", role = c("aut", "cre", "trl"), comment = "Package creator and maintainer"),
     person("Reilly", "Innes", email = "Reilly.Innes@uon.edu.au", role = c("aut")),
@@ -26,9 +26,10 @@ Imports:
     condMVNorm,
     invgamma,
     MCMCpack,
-	mixtools
+    mixtools,
+    corpcor
 Suggests:
 	pmwg
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.0

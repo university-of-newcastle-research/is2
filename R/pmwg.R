@@ -95,8 +95,8 @@ extract_pmwgs <- function(x) {
     # calculate the covariance matrix for random effects, mu and sigma
     sigma_tilde[j, , ] <- stats::cov(t(subject_samples))
     #this checks that the sigma_tilde is pos def and if not, makes it pos def
-    if(!corpcor::is.positive.definite(sigma_tilde[i,,], tol=1e-8)){
-      sigma_tilde[i,,]<-corpcor::make.positive.definite(sigma_tilde[i,,], tol=1e-6)
+    if(!corpcor::is.positive.definite(sigma_tilde[j,,], tol=1e-8)){
+      sigma_tilde[j,,]<-corpcor::make.positive.definite(sigma_tilde[j,,], tol=1e-6)
     }
   }
 
